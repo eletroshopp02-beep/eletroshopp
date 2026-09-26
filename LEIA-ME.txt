@@ -1,0 +1,7 @@
+ELETROSHOPP — APLICATIVO (PWA)
+
+Esta versão transforma a loja em um aplicativo instalável (PWA), mantendo o catálogo, carrinho e WhatsApp.
+
+IMPORTANTE: a instalação como aplicativo exige que a loja seja aberta por HTTPS ou localhost. Abrir o index.html diretamente pelo gerenciador de arquivos mantém a loja funcionando, mas o modo instalável/PWA pode não aparecer.
+
+Quando a loja estiver publicada em um endereço HTTPS (por exemplo, GitHub Pages), abra o endereço no Chrome do celular e use “Instalar aplicativo” ou “Adicionar à tela inicial”, conforme o navegador.
