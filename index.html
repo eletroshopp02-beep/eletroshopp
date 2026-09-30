@@ -822,16 +822,21 @@ window.selectPayment=function(method,el){selectedPayment=method;document.querySe
 function getBuyerData(){return {
  name:document.getElementById('buyerName').value.trim(), phone:document.getElementById('buyerPhone').value.trim(), cep:formatCep(cleanCep(document.getElementById('freightCep').value)), city:document.getElementById('buyerCity').value.trim(), address:document.getElementById('buyerAddress').value.trim(), number:document.getElementById('buyerNumber').value.trim(), neighborhood:document.getElementById('buyerNeighborhood').value.trim(), complement:document.getElementById('buyerComplement').value.trim(), note:document.getElementById('buyerNote').value.trim()
 }}
-// Eletroshopp 2.14 — pedidos em nuvem (Supabase) + painel exclusivo do proprietário.
+// Eletroshopp 2.16 TESTE REST — diagnóstico temporário de pedidos em nuvem (Supabase) + painel exclusivo do proprietário.
 // A configuração fica no arquivo supabase-config.js.
 let supabaseClient=null;
 let cloudReady=false;
 let cloudChannel=null;
 try{
-  const cfgUrl=(typeof SUPABASE_URL!=='undefined')?SUPABASE_URL:'';
-  const cfgKey=(typeof SUPABASE_ANON_KEY!=='undefined')?SUPABASE_ANON_KEY:((typeof SUPABASE_PUBLISHABLE_KEY!=='undefined')?SUPABASE_PUBLISHABLE_KEY:'');
-  if(window.supabase && cfgUrl.startsWith('https://') && cfgKey && !cfgUrl.includes('COLE_AQUI') && !cfgKey.includes('COLE_AQUI')){
-    supabaseClient=window.supabase.createClient(cfgUrl,cfgKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+  // Fallback embutido para testes locais: usa a chave PUBLICÁVEL do projeto.
+  const cfgUrl=(typeof SUPABASE_URL!=='undefined' && SUPABASE_URL)?SUPABASE_URL:'https://sybxbyaywznbwipbssso.supabase.co';
+  const cfgKey=(typeof SUPABASE_ANON_KEY!=='undefined' && SUPABASE_ANON_KEY)?SUPABASE_ANON_KEY:((typeof SUPABASE_PUBLISHABLE_KEY!=='undefined' && SUPABASE_PUBLISHABLE_KEY)?SUPABASE_PUBLISHABLE_KEY:'sb_publishable_3iXGUzzTaypiGou7K7UFEw_OW1qKljR');
+  if(cfgUrl.startsWith('https://') && cfgKey && !cfgUrl.includes('COLE_AQUI') && !cfgKey.includes('COLE_AQUI')){
+    if(window.supabase){
+      supabaseClient=window.supabase.createClient(cfgUrl,cfgKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+    }
+    // O navegador pode bloquear o SDK externo quando este HTML é aberto como content://.
+    // Para pedidos, usamos REST diretamente como fallback; assim o teste local não depende do CDN.
     cloudReady=true;
   } else {
     console.warn('Supabase: configuração não encontrada ou incompleta em supabase-config.js');
@@ -845,10 +850,98 @@ function makeOrder(){
 async function saveCloudOrder(order){
  if(!cloudReady) throw new Error('CLOUD_NOT_CONFIGURED');
  const row={id:order.id,created_at:order.createdAt,status:order.status,payment:order.payment,freight:order.freight,total_products:order.totalProducts,grand_total:order.grandTotal,weight:order.weight,buyer:order.buyer,items:order.items};
- const {error}=await supabaseClient.from('orders').insert(row);
- if(error) throw error;
+ if(supabaseClient){
+   const {error}=await supabaseClient.from('orders').insert(row);
+   if(error) throw error;
+ } else {
+   const cfgUrl='https://sybxbyaywznbwipbssso.supabase.co';
+   const cfgKey='sb_publishable_3iXGUzzTaypiGou7K7UFEw_OW1qKljR';
+   const res=await fetch(cfgUrl+'/rest/v1/orders',{method:'POST',headers:{'apikey':cfgKey,'Authorization':'Bearer '+cfgKey,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(row)});
+   if(!res.ok){
+     const body=await res.text();
+     let detail=body; try{const j=JSON.parse(body);detail=j.message||j.details||j.hint||body}catch(_){ }
+     const err=new Error(detail||('HTTP '+res.status)); err.code='REST_'+res.status; throw err;
+   }
+ }
  return order;
 }
+
+// Resolve the product IDs from the public `produtos` table.
+// The real database uses a capitalized product-name column (e.g. "Nome")
+// and may also use an accented price column (e.g. "preço"). We therefore
+// read the table with `select('*')` and detect the actual column names instead
+// of assuming lowercase SQL identifiers.
+async function resolveOrderProductIds(order){
+ const names=[...new Set((order.items||[]).map(i=>String(i.name||'').trim()).filter(Boolean))];
+ if(!names.length)return [];
+ let products=[];
+ if(supabaseClient){
+   const {data,error}=await supabaseClient.from('produtos').select('*');
+   if(error)throw error;
+   products=data||[];
+ }else{
+   const cfgUrl='https://sybxbyaywznbwipbssso.supabase.co';
+   const cfgKey='sb_publishable_3iXGUzzTaypiGou7K7UFEw_OW1qKljR';
+   const url=cfgUrl+'/rest/v1/produtos?select=*';
+   const res=await fetch(url,{headers:{'apikey':cfgKey,'Authorization':'Bearer '+cfgKey}});
+   if(!res.ok){const body=await res.text();let detail=body;try{const j=JSON.parse(body);detail=j.message||j.details||j.hint||body}catch(_){ }const err=new Error(detail||('HTTP '+res.status));err.code='PRODUCTS_'+res.status;throw err;}
+   products=await res.json();
+ }
+ const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
+ const normKey=v=>norm(v).replace(/[^a-z0-9]+/g,'');
+ const pickKey=(obj,candidates)=>{
+   const keys=Object.keys(obj||{});
+   for(const c of candidates){const exact=keys.find(k=>normKey(k)===normKey(c));if(exact)return exact;}
+   for(const c of candidates){const base=normKey(c);const loose=keys.find(k=>normKey(k).startsWith(base));if(loose)return loose;}
+   return null;
+ };
+ const sample=products[0]||{};
+ const nameKey=pickKey(sample,['nome','name','nome_produto','descricao','description']);
+ const idKey=pickKey(sample,['id','produto_id']);
+ const priceKey=pickKey(sample,['preco','preço','price','preco_venda','preco_unitario','valor']);
+ if(!nameKey||!idKey){
+   const err=new Error('A tabela produtos não possui colunas reconhecíveis de ID e nome. Colunas encontradas: '+Object.keys(sample).join(', '));
+   err.code='PRODUCT_SCHEMA';
+   throw err;
+ }
+ const byName=new Map((products||[]).map(p=>[norm(p[nameKey]),p]));
+ const missing=[];
+ const resolved=order.items.map(item=>{
+   const p=byName.get(norm(item.name));
+   if(!p){missing.push(item.name);return null;}
+   return {item,product:p,priceKey};
+ });
+ if(missing.length){
+   const err=new Error('Produto(s) não encontrado(s) na tabela produtos: '+missing.join(', '));
+   err.code='PRODUCT_NOT_FOUND';
+   throw err;
+ }
+ return resolved;
+}
+
+async function saveOrderItems(order){
+ const resolved=await resolveOrderProductIds(order);
+ const rows=resolved.map(({item,product})=>({
+   pedido_id:order.id,
+   produto_id:product.id,
+   quantidade:Number(item.qty||1),
+   preco_unitario:Number.isFinite(Number(product[priceKey]))?Number(product[priceKey]):priceValue(item.sale)
+ }));
+ if(!rows.length)return;
+ if(supabaseClient){
+   const {error}=await supabaseClient.from('itens_do_pedido').insert(rows);
+   if(error)throw error;
+ }else{
+   const cfgUrl='https://sybxbyaywznbwipbssso.supabase.co';
+   const cfgKey='sb_publishable_3iXGUzzTaypiGou7K7UFEw_OW1qKljR';
+   const res=await fetch(cfgUrl+'/rest/v1/itens_do_pedido',{method:'POST',headers:{'apikey':cfgKey,'Authorization':'Bearer '+cfgKey,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(rows)});
+   if(!res.ok){
+     const body=await res.text();let detail=body;try{const j=JSON.parse(body);detail=j.message||j.details||j.hint||body}catch(_){ }
+     const err=new Error(detail||('HTTP '+res.status));err.code='ITEMS_'+res.status;throw err;
+   }
+ }
+}
+
 function orderFromRow(r){return {id:r.id,createdAt:r.created_at,status:r.status,payment:r.payment,freight:r.freight||{id:'—',price:0,days:'—'},totalProducts:Number(r.total_products||0),grandTotal:Number(r.grand_total||0),weight:Number(r.weight||0),buyer:r.buyer||{},items:r.items||[]}}
 function cacheOrders(orders){localStorage.setItem('eletro_orders',JSON.stringify(orders));}
 async function fetchCloudOrders(){
@@ -886,16 +979,37 @@ window.confirmPaymentAndSend=async function(){
  if(!selectedPayment)return alert('Escolha uma forma de pagamento para continuar.');
  if(!selectedFreight)return alert('Selecione o frete antes de continuar.');
  if(!cloudReady)return alert('⚙️ A loja ainda não está conectada ao painel de pedidos.\n\nO administrador precisa concluir a configuração do Supabase antes de receber pedidos na nuvem.');
+ const buyer=getBuyerData();
+ const required=[['Nome',buyer.name],['WhatsApp / telefone',buyer.phone],['CEP',buyer.cep],['Cidade / UF',buyer.city],['Endereço',buyer.address],['Número',buyer.number],['Bairro',buyer.neighborhood]];
+ const missing=required.filter(x=>!x[1]).map(x=>x[0]);
+ if(missing.length){alert('Preencha os dados do destinatário antes de finalizar:\n\n• '+missing.join('\n• '));return;}
+ if(cleanCep(buyer.cep).length!==8){alert('Informe um CEP de destino válido com 8 números.');return;}
  const order=makeOrder();
  const btn=document.querySelector('.payment-confirm');
  if(btn){btn.disabled=true;btn.textContent='⏳ Registrando pedido...'}
  try{
    await saveCloudOrder(order);
+   await saveOrderItems(order);
    const totalProducts=order.totalProducts,grand=order.grandTotal,lines=order.items.map(p=>'• '+p.name+' — '+p.sale+' — '+p.qty+'x').join('\n');const b=order.buyer;
    const msg='Olá! Quero finalizar um pedido na Eletroshopp.\n\n'+lines+'\n\nTotal dos produtos: '+moneyBR(totalProducts)+'\nFrete: '+order.freight.id+' — '+moneyBR(order.freight.price)+'\nTotal do pedido: '+moneyBR(grand)+'\nForma de pagamento: '+selectedPayment+'\n\nDADOS DO DESTINATÁRIO\nNome: '+b.name+'\nTelefone: '+b.phone+'\nCEP: '+b.cep+'\nEndereço: '+b.address+', nº '+b.number+'\nBairro: '+b.neighborhood+'\nComplemento: '+b.complement+'\nCidade/UF: '+b.city+'\nObservação: '+b.note+'\n\nID DO PEDIDO: '+order.id+'\nQuero confirmar estoque e concluir o pagamento.';
    closePaymentCheckout();
    location.href='https://wa.me/'+wa+'?text='+encodeURIComponent(msg);
- }catch(e){console.error(e);alert('Não foi possível registrar seu pedido agora. Verifique sua conexão e tente novamente.');}
+ }catch(e){
+   console.error('Eletroshopp — erro completo ao registrar pedido:',e);
+   const code=e?.code||'sem código';
+   const message=e?.message||String(e)||'erro desconhecido';
+   const details=e?.details||'';
+   const hint=e?.hint||'';
+   let diagnostic='❌ Não foi possível registrar o pedido no Supabase.\n\n';
+   diagnostic+='Código: '+code+'\n';
+   diagnostic+='Mensagem: '+message+'\n';
+   if(code==='ITEMS_401'||code==='ITEMS_403') diagnostic+='\nAtenção: o pedido foi registrado, mas o Supabase bloqueou a gravação dos itens. Precisamos ajustar a política RLS da tabela itens_do_pedido.\n';
+   if(code==='PRODUCT_NOT_FOUND') diagnostic+='\nAtenção: o produto do carrinho não foi encontrado na tabela produtos.\n';
+   if(details) diagnostic+='Detalhes: '+details+'\n';
+   if(hint) diagnostic+='Dica do Supabase: '+hint+'\n';
+   diagnostic+='\nEsse diagnóstico é temporário para identificarmos a causa exata.';
+   alert(diagnostic);
+ }
  finally{if(btn){btn.disabled=false;btn.textContent='✅ Confirmar pedido e ir para o WhatsApp'}}
 };
 window.finishEletroOrder=window.openPaymentCheckout;
