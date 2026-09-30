@@ -849,18 +849,32 @@ function makeOrder(){
 }
 async function saveCloudOrder(order){
  if(!cloudReady) throw new Error('CLOUD_NOT_CONFIGURED');
- const row={id:order.id,created_at:order.createdAt,status:order.status,payment:order.payment,freight:order.freight,total_products:order.totalProducts,grand_total:order.grandTotal,weight:order.weight,buyer:order.buyer,items:order.items};
+ // O banco Eletroshopp usa as tabelas portuguesas `pedidos` e `itens_do_pedido`.
+ // Mantemos os dados do pedido compatíveis com o esquema já criado no Supabase.
+ const row={
+   id:order.id,
+   cliente_nome:order.buyer?.name||'',
+   cliente_telefone:order.buyer?.phone||'',
+   cliente_endereco:[order.buyer?.address||'',order.buyer?.number?('nº '+order.buyer.number):'',order.buyer?.neighborhood||'',order.buyer?.city||'',order.buyer?.cep||''].filter(Boolean).join(', '),
+   produtos:order.items,
+   subtotal:order.totalProducts,
+   frete:Number(order.freight?.price||0),
+   total:order.grandTotal,
+   pagamento:order.payment||'A confirmar',
+   transportadora:order.freight?.id||null,
+   status:order.status||'novo'
+ };
  if(supabaseClient){
-   const {error}=await supabaseClient.from('orders').insert(row);
+   const {error}=await supabaseClient.from('pedidos').insert(row);
    if(error) throw error;
  } else {
    const cfgUrl='https://sybxbyaywznbwipbssso.supabase.co';
    const cfgKey='sb_publishable_3iXGUzzTaypiGou7K7UFEw_OW1qKljR';
-   const res=await fetch(cfgUrl+'/rest/v1/orders',{method:'POST',headers:{'apikey':cfgKey,'Authorization':'Bearer '+cfgKey,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(row)});
+   const res=await fetch(cfgUrl+'/rest/v1/pedidos',{method:'POST',headers:{'apikey':cfgKey,'Authorization':'Bearer '+cfgKey,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(row)});
    if(!res.ok){
      const body=await res.text();
      let detail=body; try{const j=JSON.parse(body);detail=j.message||j.details||j.hint||body}catch(_){ }
-     const err=new Error(detail||('HTTP '+res.status)); err.code='REST_'+res.status; throw err;
+     const err=new Error(detail||('HTTP '+res.status)); err.code='ORDERS_'+res.status; throw err;
    }
  }
  return order;
@@ -909,7 +923,7 @@ async function resolveOrderProductIds(order){
  const resolved=order.items.map(item=>{
    const p=byName.get(norm(item.name));
    if(!p){missing.push(item.name);return null;}
-   return {item,product:p,priceKey};
+   return {item,product:p,idKey,priceKey};
  });
  if(missing.length){
    const err=new Error('Produto(s) não encontrado(s) na tabela produtos: '+missing.join(', '));
@@ -921,9 +935,9 @@ async function resolveOrderProductIds(order){
 
 async function saveOrderItems(order){
  const resolved=await resolveOrderProductIds(order);
- const rows=resolved.map(({item,product})=>({
+ const rows=resolved.map(({item,product,idKey,priceKey})=>({
    pedido_id:order.id,
-   produto_id:product.id,
+   produto_id:product[idKey],
    quantidade:Number(item.qty||1),
    preco_unitario:Number.isFinite(Number(product[priceKey]))?Number(product[priceKey]):priceValue(item.sale)
  }));
@@ -942,17 +956,22 @@ async function saveOrderItems(order){
  }
 }
 
-function orderFromRow(r){return {id:r.id,createdAt:r.created_at,status:r.status,payment:r.payment,freight:r.freight||{id:'—',price:0,days:'—'},totalProducts:Number(r.total_products||0),grandTotal:Number(r.grand_total||0),weight:Number(r.weight||0),buyer:r.buyer||{},items:r.items||[]}}
+function orderFromRow(r){
+ let items=[];try{items=Array.isArray(r.produtos)?r.produtos:(typeof r.produtos==='string'?JSON.parse(r.produtos||'[]'):[])}catch(_){items=[]}
+ const buyer={name:r.cliente_nome||'',phone:r.cliente_telefone||'',address:r.cliente_endereco||'',number:'',neighborhood:'',city:'',cep:'',complement:'',note:''};
+ const freightPrice=Number(r.frete||0);
+ return {id:r.id,createdAt:r.criado_em||r.created_at,status:r.status||'novo',payment:r.pagamento||r.payment||'',freight:{id:r.transportadora||'—',price:freightPrice,days:'—'},totalProducts:Number(r.subtotal||0),grandTotal:Number(r.total||0),weight:0,buyer,items};
+}
 function cacheOrders(orders){localStorage.setItem('eletro_orders',JSON.stringify(orders));}
 async function fetchCloudOrders(){
  if(!cloudReady) throw new Error('CLOUD_NOT_CONFIGURED');
- const {data,error}=await supabaseClient.from('orders').select('*').order('created_at',{ascending:false});
+ const {data,error}=await supabaseClient.from('pedidos').select('*').order('criado_em',{ascending:false});
  if(error) throw error;
  const orders=(data||[]).map(orderFromRow);cacheOrders(orders);return orders;
 }
 async function cloudCount(){
  if(!cloudReady)return 0;
- const {count,error}=await supabaseClient.from('orders').select('*',{count:'exact',head:true}).eq('status','novo');
+ const {count,error}=await supabaseClient.from('pedidos').select('*',{count:'exact',head:true}).eq('status','novo');
  if(error) throw error;return count||0;
 }
 window.updateAdminOrdersIndicator=async function(){
@@ -966,8 +985,8 @@ window.openAdminOrders=async function(){
  try{const session=(await supabaseClient.auth.getSession()).data.session;if(!session){return alert('🔐 Faça login do proprietário primeiro.')}await fetchCloudOrders();renderAdminOrders();document.getElementById('adminOrdersModal').classList.add('open');updateAdminOrdersIndicator()}catch(e){console.error(e);alert('Não foi possível carregar os pedidos. Verifique sua conexão e a configuração do banco.')}};
 window.closeAdminOrders=function(){document.getElementById('adminOrdersModal').classList.remove('open')};
 function renderAdminOrders(){const box=document.getElementById('adminOrdersList');const orders=JSON.parse(localStorage.getItem('eletro_orders')||'[]');if(!orders.length){box.innerHTML='<div class="orders-empty">📭 Nenhum pedido recebido ainda.</div>';return}box.innerHTML=orders.map(o=>{const d=new Date(o.createdAt);const when=d.toLocaleDateString('pt-BR')+' às '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});const b=o.buyer||{};const items=(o.items||[]).map(i=>`${i.qty}x ${i.name}`).join(' • ');return `<article class="order-card ${o.status==='novo'?'new':''}"><div class="order-top"><div><div class="order-id">${o.id}</div><div style="color:#aaa;font-size:11px">${when}</div></div><span class="order-status ${o.status==='impresso'?'printed':''}">${o.status==='novo'?'NOVO':'IMPRESSO'}</span></div><div class="order-meta"><b>Cliente:</b> ${b.name||'Não informado'}${b.phone?' • '+b.phone:''}<br><b>Destino:</b> ${b.address||'—'}${b.number?', nº '+b.number:''}${b.neighborhood?', '+b.neighborhood:''} — ${b.city||'—'} • CEP ${b.cep||'—'}<br><b>Envio:</b> ${o.freight.id} — ${moneyBR(o.freight.price)} • ${o.freight.days}<br><b>Pagamento:</b> ${o.payment||'—'}<br><b>Itens:</b> ${items}</div><div class="order-total">Total: ${moneyBR(o.grandTotal)}</div><div class="order-actions"><button class="order-print" onclick="printStoredOrder('${o.id}')">🏷️ Imprimir etiqueta</button><button class="order-delete" onclick="deleteStoredOrder('${o.id}')">🗑️ Excluir</button></div></article>`}).join('')}
-window.deleteStoredOrder=async function(id){if(!confirm('Excluir este pedido do painel?'))return;if(!cloudReady)return;try{const {error}=await supabaseClient.from('orders').delete().eq('id',id);if(error)throw error;await fetchCloudOrders();renderAdminOrders();updateAdminOrdersIndicator()}catch(e){console.error(e);alert('Não foi possível excluir o pedido.')}};
-window.printStoredOrder=async function(id){const orders=JSON.parse(localStorage.getItem('eletro_orders')||'[]');const o=orders.find(x=>x.id===id);if(!o)return alert('Pedido não encontrado.');try{if(cloudReady){const {error}=await supabaseClient.from('orders').update({status:'impresso'}).eq('id',id);if(error)throw error;}o.status='impresso';cacheOrders(orders);updateAdminOrdersIndicator();renderAdminOrders();printOrderData(o)}catch(e){console.error(e);alert('Não foi possível atualizar o status do pedido.')}};
+window.deleteStoredOrder=async function(id){if(!confirm('Excluir este pedido do painel?'))return;if(!cloudReady)return;try{const {error}=await supabaseClient.from('pedidos').delete().eq('id',id);if(error)throw error;await fetchCloudOrders();renderAdminOrders();updateAdminOrdersIndicator()}catch(e){console.error(e);alert('Não foi possível excluir o pedido.')}};
+window.printStoredOrder=async function(id){const orders=JSON.parse(localStorage.getItem('eletro_orders')||'[]');const o=orders.find(x=>x.id===id);if(!o)return alert('Pedido não encontrado.');try{if(cloudReady){const {error}=await supabaseClient.from('pedidos').update({status:'impresso'}).eq('id',id);if(error)throw error;}o.status='impresso';cacheOrders(orders);updateAdminOrdersIndicator();renderAdminOrders();printOrderData(o)}catch(e){console.error(e);alert('Não foi possível atualizar o status do pedido.')}};
 function printOrderData(o){
  const b=o.buyer||{}, method=o.freight.id, freightValue=moneyBR(o.freight.price), deadline=o.freight.days, grand=o.grandTotal, items=(o.items||[]).map(p=>'<li><b>'+p.qty+'x</b> '+p.name+' — '+p.sale+'</li>').join('');
  const date=new Date(o.createdAt);const dateText=date.toLocaleDateString('pt-BR'),time=date.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});const cep=b.cep||'—',city=b.city||'Cidade/UF não informada',name=b.name||'Destinatário não informado';
