@@ -844,19 +844,31 @@ function makeOrder(){
  return {id,createdAt:new Date().toISOString(),status:'novo',payment:selectedPayment,freight:{id:selectedFreight.id.toUpperCase(),price:selectedFreight.price,days:selectedFreight.days},totalProducts,grandTotal:totalProducts+selectedFreight.price,weight:getPackageWeight(),buyer:getBuyerData(),items:cart.map(p=>({code:p.code,name:p.name,sale:p.sale,qty:p._qty||1,image:p.image}))};
 }
 async function saveCloudOrder(order){
+ if(!order || !order.id) throw new Error('ORDER_ID_REQUIRED');
  if(!cloudReady) throw new Error('CLOUD_NOT_CONFIGURED');
- const row={id:order.id,created_at:order.createdAt,status:order.status,payment:order.payment,freight:order.freight,total_products:order.totalProducts,grand_total:order.grandTotal,weight:order.weight,buyer:order.buyer,items:order.items};
+ const orderRow={
+   id:order.id,
+   createdAt:order.createdAt,
+   status:order.status,
+   payment:order.payment,
+   freight:order.freight,
+   totalProducts:order.totalProducts,
+   grandTotal:order.grandTotal,
+   weight:order.weight,
+   buyer:order.buyer,
+   items:order.items
+ };
  if(supabaseClient){
-   const {error}=await supabaseClient.from('orders').insert(row);
+   const {error}=await supabaseClient.rpc('register_order',{order_row:orderRow});
    if(error) throw error;
- } else {
+ }else{
    const cfgUrl='https://sybxbyaywznbwipbssso.supabase.co';
    const cfgKey='sb_publishable_3iXGUzzTaypiGou7K7UFEw_OW1qKljR';
-   const res=await fetch(cfgUrl+'/rest/v1/orders',{method:'POST',headers:{'apikey':cfgKey,'Authorization':'Bearer '+cfgKey,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(row)});
+   const res=await fetch(cfgUrl+'/rest/v1/rpc/register_order',{method:'POST',headers:{'apikey':cfgKey,'Authorization':'Bearer '+cfgKey,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({order_row:orderRow})});
    if(!res.ok){
      const body=await res.text();
      let detail=body; try{const j=JSON.parse(body);detail=j.message||j.details||j.hint||body}catch(_){ }
-     const err=new Error(detail||('HTTP '+res.status)); err.code='REST_'+res.status; throw err;
+     const err=new Error(detail||('HTTP '+res.status)); err.code='RPC_'+res.status; throw err;
    }
  }
  return order;
