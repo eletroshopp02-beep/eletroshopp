@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Eletroshopp">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <style>
 *{box-sizing:border-box}body{margin:0;background:#080808;color:#fff;font-family:Inter,Arial,sans-serif}.wrap{max-width:1240px;margin:auto;padding:0 18px}header{position:sticky;top:0;z-index:20;background:#090909ee;backdrop-filter:blur(10px);border-bottom:2px solid #ffd400}.nav{display:flex;align-items:center;gap:20px;padding:16px 0}.logo{font-weight:900;font-size:30px;color:#ffd400}.logo span{color:#fff}.search{flex:1;background:#171717;border:1px solid #333;color:#fff;border-radius:12px;padding:14px 16px;font-size:15px}.cart{background:#ffd400;color:#000;border:0;border-radius:12px;padding:13px 16px;font-weight:900;cursor:pointer}.hero{padding:52px 0;background:radial-gradient(circle at 80% 30%,#3b3200 0,#111 35%,#090909 75%);border-bottom:1px solid #222}.tag{display:inline-block;background:#ffd400;color:#000;padding:7px 12px;border-radius:999px;font-weight:900;font-size:12px}.hero h1{font-size:clamp(38px,6vw,64px);margin:15px 0 8px}.hero h1 span{color:#ffd400}.hero p{max-width:720px;color:#bbb;font-size:17px;line-height:1.6}.hero-actions{margin-top:22px}.waHero{display:inline-flex;align-items:center;justify-content:center;background:#ffd400;color:#000;text-decoration:none;border-radius:12px;padding:14px 22px;font-weight:900;box-shadow:0 8px 25px #0008}.waHero:hover{transform:translateY(-1px)}.notice{margin-top:18px;color:#ddd;font-size:13px}.filters{display:flex;gap:9px;overflow:auto;padding:22px 0}.filter{white-space:nowrap;background:#151515;color:#fff;border:1px solid #333;border-radius:999px;padding:10px 14px;cursor:pointer}.filter.active{background:#ffd400;color:#000;border-color:#ffd400;font-weight:900}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px;padding-bottom:60px}.card{background:#131313;border:1px solid #292929;border-radius:18px;overflow:hidden;display:flex;flex-direction:column;min-width:0}.visual{height:285px;background:#f5f5f5;padding:8px;display:flex;align-items:center;justify-content:center}.visual img{width:100%;height:100%;object-fit:contain}.info{padding:17px}.cat{font-size:11px;text-transform:uppercase;color:#ffd400;font-weight:900}.name{font-size:20px;font-weight:900;margin:7px 0}.desc{color:#aaa;font-size:14px;line-height:1.45;min-height:60px}.cost{color:#777;text-decoration:line-through;font-size:13px;margin-top:10px}.price{font-size:29px;font-weight:900;color:#ffd400;margin:8px 0 14px}.sold{display:inline-block;margin:10px 0 14px;background:#d71920;color:#fff;padding:7px 10px;border-radius:8px;font-weight:900;font-size:12px}.buy{width:100%;border:0;background:#ffd400;color:#000;border-radius:11px;padding:13px;font-weight:900;cursor:pointer}.count{color:#aaa;font-size:13px;margin-bottom:15px}footer{border-top:1px solid #292929;padding:35px 0;color:#888;text-align:center}@media(max-width:600px){.nav{flex-wrap:wrap}.logo{font-size:26px}.search{order:3;flex-basis:100%}.visual{height:250px}}
 .funnel{margin:4px 0 28px;padding:22px;border:1px solid #2b2b2b;border-radius:18px;background:linear-gradient(135deg,#111,#171717)}.funnel-title{font-size:20px;font-weight:900;margin-bottom:16px}.funnel-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.funnel-grid>div{background:#0d0d0d;border:1px solid #292929;border-radius:12px;padding:14px}.funnel-grid b{display:block;color:#ffd400;margin-bottom:6px}.funnel-grid span{display:block;color:#bbb;font-size:13px;line-height:1.45}.funnel-cta{display:inline-flex;margin-top:16px;background:#ffd400;color:#000;text-decoration:none;font-weight:900;padding:13px 18px;border-radius:12px}.funnel-cta:hover{transform:translateY(-1px)}@media(max-width:760px){.funnel-grid{grid-template-columns:1fr 1fr}}@media(max-width:480px){.funnel-grid{grid-template-columns:1fr}}
@@ -846,30 +846,17 @@ function makeOrder(){
 async function saveCloudOrder(order){
  if(!order || !order.id) throw new Error('ORDER_ID_REQUIRED');
  if(!cloudReady) throw new Error('CLOUD_NOT_CONFIGURED');
- const orderRow={
-   id:order.id,
-   createdAt:order.createdAt,
-   status:order.status,
-   payment:order.payment,
-   freight:order.freight,
-   totalProducts:order.totalProducts,
-   grandTotal:order.grandTotal,
-   weight:order.weight,
-   buyer:order.buyer,
-   items:order.items
- };
+ const payload={id:order.id,createdAt:order.createdAt,status:order.status,payment:order.payment,freight:order.freight,totalProducts:order.totalProducts,grandTotal:order.grandTotal,weight:order.weight,buyer:order.buyer,items:order.items};
  if(supabaseClient){
-   const {error}=await supabaseClient.rpc('register_order',{order_row:orderRow});
+   const {data,error}=await supabaseClient.functions.invoke('create-order',{body:payload});
    if(error) throw error;
+   if(data?.ok!==true) throw Object.assign(new Error(data?.error||'Não foi possível registrar o pedido.'),{code:data?.code||'CREATE_ORDER_FAILED',details:data?.details||''});
  }else{
    const cfgUrl='https://sybxbyaywznbwipbssso.supabase.co';
    const cfgKey='sb_publishable_3iXGUzzTaypiGou7K7UFEw_OW1qKljR';
-   const res=await fetch(cfgUrl+'/rest/v1/rpc/register_order',{method:'POST',headers:{'apikey':cfgKey,'Authorization':'Bearer '+cfgKey,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({order_row:orderRow})});
-   if(!res.ok){
-     const body=await res.text();
-     let detail=body; try{const j=JSON.parse(body);detail=j.message||j.details||j.hint||body}catch(_){ }
-     const err=new Error(detail||('HTTP '+res.status)); err.code='RPC_'+res.status; throw err;
-   }
+   const res=await fetch(cfgUrl+'/functions/v1/create-order',{method:'POST',headers:{'apikey':cfgKey,'Authorization':'Bearer '+cfgKey,'Content-Type':'application/json'},body:JSON.stringify(payload)});
+   const body=await res.text(); let data={}; try{data=JSON.parse(body)}catch(_){}
+   if(!res.ok || data?.ok!==true){const err=new Error(data?.error||('HTTP '+res.status));err.code=data?.code||('FUNCTION_'+res.status);err.details=data?.details||body;throw err;}
  }
  return order;
 }
