@@ -1,4 +1,4 @@
-const CACHE="eletroshopp-final-v17";
+const CACHE="eletroshopp-final-v18";
 const CORE=["./","./index.html","./manifest.webmanifest","./app.js","./cart-fix.js"];
 
 self.addEventListener("install",event=>{
