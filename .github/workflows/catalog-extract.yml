@@ -10,12 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Extract
+      - name: Extract size
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          p=Path("index.html")
-          s=p.read_text(encoding="utf-8",errors="ignore")
+          s=Path("index.html").read_text(encoding="utf-8",errors="ignore")
           Path("catalog-size.txt").write_text(str(len(s.encode("utf-8"))))
           PY
       - name: Commit
