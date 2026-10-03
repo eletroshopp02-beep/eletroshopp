@@ -51,17 +51,37 @@ function findCep(){const inputs=[...document.querySelectorAll("input")];const na
 function freightBox(){return document.getElementById("freightResults")||document.getElementById("eletroFreightResults")||[...document.querySelectorAll("body *")].find(x=>x.children.length===0&&/Consultando tarifas reais|Calcular frete/i.test(x.textContent||""))?.parentElement||null}
 function shippingProducts(){return cart.map((p,i)=>({id:p.id??p.code??i+1,code:String(p.code??""),name:String(p.name??"Produto"),width:Math.max(1,num(p.width??p.largura??p.shipping_width)||8),height:Math.max(1,num(p.height??p.altura??p.shipping_height)||4),length:Math.max(1,num(p.length??p.comprimento??p.shipping_length)||20),weight:Math.max(.01,num(p.weight??p.peso??p.shipping_weight)||.30),value:price(p),quantity:q(p._qty),category:p.category||"Eletrônicos"}))}
 function updateWeight(){const ps=shippingProducts();const w=ps.reduce((s,p)=>s+p.weight*p.quantity,0);[...document.querySelectorAll("body *")].filter(x=>x.children.length===0&&/Peso estimado do pacote/i.test(x.textContent||"")).forEach(x=>x.textContent="📦 Peso estimado do pacote "+w.toFixed(2).replace(".",",")+" kg")}
+let freightProgressTimer=null;
+function stopFreightProgress(){if(freightProgressTimer){clearInterval(freightProgressTimer);freightProgressTimer=null}}
+function startFreightProgress(box){
+  stopFreightProgress();
+  if(!box)return;
+  box.innerHTML='<div class="freight-progress-wrap"><div class="freight-progress-title">⏳ Consultando tarifas reais...</div><div class="freight-progress-track"><div class="freight-progress-bar" id="eshFreightProgressBar"></div></div><div class="freight-progress-text" id="eshFreightProgressText">Conectando à Frenet...</div></div>';
+  let p=4,sec=0;
+  const bar=box.querySelector("#eshFreightProgressBar"),txt=box.querySelector("#eshFreightProgressText");
+  freightProgressTimer=setInterval(()=>{
+    sec++;
+    if(p<90)p+=p<40?6:p<70?3:1;
+    if(bar)bar.style.width=p+"%";
+    if(txt)txt.textContent=sec<5?"Enviando dados do pedido...":sec<12?"Consultando transportadoras...":sec<20?"Aguardando tarifas e prazos...":"Finalizando cotação...";
+  },1000);
+}
+function finishFreightProgress(box,success){
+  stopFreightProgress();
+  const bar=box?.querySelector("#eshFreightProgressBar");
+  if(bar){bar.style.width=success?"100%":"0%"}
+}
 async function quoteFreight(){
   const box=freightBox();if(!cart.length){if(box)box.innerHTML='<div class="freight-error">Adicione um produto ao carrinho.</div>';return}
   const cep=findCep();if(!/^\d{8}$/.test(cep)){if(box)box.innerHTML='<div class="freight-error">Informe um CEP de destino válido.</div>';return}
-  const productsForQuote=shippingProducts();updateWeight();if(box)box.innerHTML='<div class="loading">⏳ Consultando tarifas reais...</div>';
+  const productsForQuote=shippingProducts();updateWeight();startFreightProgress(box);
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),28000);
   try{
     const r=await fetch(SUPABASE_URL+"/functions/v1/frenet-quote",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY},body:JSON.stringify({fromPostalCode:FROM_CEP,toPostalCode:cep,products:productsForQuote}),signal:controller.signal});
     const raw=await r.text();let data={};try{data=raw?JSON.parse(raw):{}}catch(e){data={message:raw}}if(!r.ok)throw new Error(data.error||data.message||("HTTP "+r.status));
     const opts=Array.isArray(data.quotes)?data.quotes:[];if(!opts.length)throw new Error(data.error||"Nenhuma opção de envio encontrada.");window.__ESH_FREIGHT_OPTIONS=opts;
-    if(box){box.innerHTML=opts.map((o,i)=>'<button type="button" class="freight-option" data-esh-freight="'+i+'"><span><b>🚚 '+String(o.company?o.company+" — ":"")+(o.name||"Frete")+'</b><small>'+(o.days??"consulte")+' dias úteis</small></span><strong>'+money(o.price)+'</strong></button>').join("");box.querySelectorAll("[data-esh-freight]").forEach(btn=>btn.addEventListener("click",()=>{const o=window.__ESH_FREIGHT_OPTIONS[Number(btn.dataset.eshFreight)];window.state=window.state||{};window.state.freight={id:String(o.id||o.name||"frete"),name:o.name||"Frete",company:o.company||"",price:num(o.price),days:o.days??"",carrierCode:o.carrierCode||""};box.querySelectorAll("[data-esh-freight]").forEach(x=>x.classList.remove("selected"));btn.classList.add("selected");if(typeof window.updateSummary==="function")try{window.updateSummary()}catch(e){}}))}
-  }catch(e){console.error("Eletroshopp Frenet",e);if(box)box.innerHTML='<div class="freight-error">Falha ao calcular o frete: '+String(e.name==="AbortError"?"tempo esgotado":e.message||"erro desconhecido")+'</div>'}finally{clearTimeout(timer)}
+    finishFreightProgress(box,true);if(box){box.innerHTML=opts.map((o,i)=>'<button type="button" class="freight-option" data-esh-freight="'+i+'"><span><b>🚚 '+String(o.company?o.company+" — ":"")+(o.name||"Frete")+'</b><small>'+(o.days??"consulte")+' dias úteis</small></span><strong>'+money(o.price)+'</strong></button>').join("");box.querySelectorAll("[data-esh-freight]").forEach(btn=>btn.addEventListener("click",()=>{const o=window.__ESH_FREIGHT_OPTIONS[Number(btn.dataset.eshFreight)];window.state=window.state||{};window.state.freight={id:String(o.id||o.name||"frete"),name:o.name||"Frete",company:o.company||"",price:num(o.price),days:o.days??"",carrierCode:o.carrierCode||""};box.querySelectorAll("[data-esh-freight]").forEach(x=>x.classList.remove("selected"));btn.classList.add("selected");if(typeof window.updateSummary==="function")try{window.updateSummary()}catch(e){}}))}
+  }catch(e){stopFreightProgress();console.error("Eletroshopp Frenet",e);if(box)box.innerHTML='<div class="freight-error">Falha ao calcular o frete: '+String(e.name==="AbortError"?"tempo esgotado":e.message||"erro desconhecido")+'</div>'}finally{clearTimeout(timer)}
 }
 window.addEventListener("click",function(e){
   const target=e.target?.closest?.("#quoteFreight");if(target){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();quoteFreight();return}
