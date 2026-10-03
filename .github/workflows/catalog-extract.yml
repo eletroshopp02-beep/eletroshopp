@@ -5,22 +5,66 @@ on:
     branches: [catalog-extract]
 permissions:
   contents: write
+
 jobs:
   extract:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Extract size
+
+      - name: Analyze legacy catalog
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          import re, json, html
+          from collections import Counter
           s=Path("index.html").read_text(encoding="utf-8",errors="ignore")
-          Path("catalog-size.txt").write_text(str(len(s.encode("utf-8"))))
+          report={"bytes":len(s.encode("utf-8")),"markers":{},"classes":{},"images":[],"prices":[],"snippets":[]}
+          pats=[
+            r'(?i)(?:const|let|var)\\s+(?:products|produtos|catalogo|catalog|items|itens)\\s*=',
+            r'(?i)products\\s*[:=]',
+            r'(?i)produtos\\s*[:=]',
+            r'(?i)catalog(?:o)?\\s*[:=]',
+            r'(?i)price\\s*[:=]',
+            r'(?i)pre[cç]o\\s*[:=]'
+          ]
+          for p in pats:
+            m=re.search(p,s)
+            report["markers"][p]={"found":bool(m),"position":m.start() if m else None}
+          classes=[]
+          for m in re.finditer(r'class=["\\\']([^"\\\']+)["\\\']',s,re.I):
+            classes.extend(m.group(1).split())
+          report["classes"]=dict(Counter(c for c in classes if re.search(r'(?i)(product|produto|item|card|catalog)',c)).most_common(100))
+          imgs=[]
+          for m in re.finditer(r'<img\\b([^>]+)>',s,re.I|re.S):
+            attrs=m.group(1)
+            def attr(n):
+              x=re.search(r'(?i)\\b'+n+r'\\s*=\\s*["\\\']([^"\\\']*)["\\\']',attrs)
+              return html.unescape(x.group(1)) if x else ""
+            item={"src":attr("src") or attr("data-src") or attr("data-image"),"alt":attr("alt")}
+            if item["src"] or item["alt"]:
+              if item not in imgs: imgs.append(item)
+          report["images"]=imgs[:500]
+          prices=[]
+          for p in re.findall(r'R\\$\\s*[0-9]{1,3}(?:\\.[0-9]{3})*,[0-9]{2}|[0-9]{1,3}(?:\\.[0-9]{3})*,[0-9]{2}',s):
+            if p not in prices: prices.append(p)
+          report["prices"]=prices[:300]
+          for marker in ["const products","const produtos","products =","produtos =","R$"]:
+            pos=0
+            while len(report["snippets"])<80:
+              pos=s.lower().find(marker.lower(),pos)
+              if pos<0: break
+              report["snippets"].append({"marker":marker,"position":pos,"text":s[max(0,pos-500):pos+1200]})
+              pos+=len(marker)
+          Path("catalog-debug.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
+          print("Catalog bytes:",report["bytes"])
+          print("Images:",len(report["images"]),"prices:",len(report["prices"]))
           PY
-      - name: Commit
+
+      - name: Commit diagnostics
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add catalog-size.txt
-          git commit -m "Extract catalog diagnostic" || exit 0
-          git push
+          git add catalog-debug.json
+          git commit -m "Gerar diagnóstico do catálogo legado" || exit 0
+          git push --force
