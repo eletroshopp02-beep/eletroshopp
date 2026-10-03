@@ -1,12 +1,19 @@
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-
 const SUPABASE_URL="https://sybxbyaywznbwipbssso.supabase.co";
 const SUPABASE_KEY="sb_publishable_3iXGUzzTaypiGou7K7UFEw_OW1qKljR";
 const WA="5542998157736";
-const supabase=createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
 const $=s=>document.querySelector(s);
 const money=v=>new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(Number(v)||0);
 const state={products:[],items:JSON.parse(localStorage.getItem("eletroshopp-cart")||"[]"),freight:null};
+async function invokeFunction(name,body){
+  const r=await fetch(SUPABASE_URL+"/functions/v1/"+name,{
+    method:"POST",
+    headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY},
+    body:JSON.stringify(body)
+  });
+  let data=null;try{data=await r.json();}catch{}
+  if(!r.ok)throw new Error(data?.error||data?.message||("HTTP "+r.status));
+  return {data,error:null};
+}
 
 function priceOf(p){
   if(typeof p.price==="number") return p.price;
@@ -107,7 +114,7 @@ async function quoteFreight(){
   try{
     const s=specs();
     const payload={fromPostalCode:"84272402",toPostalCode:cep,products:state.items.map(i=>({id:i.id,width:s.width,height:s.height,length:s.length,weight:s.weight,insurance_value:i.price,quantity:i.qty}))};
-    const request=supabase.functions.invoke("melhorenvio-quote",{body:payload});
+    const request=invokeFunction("melhorenvio-quote",payload);
     const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error("TIMEOUT")),15000));
     const {data,error}=await Promise.race([request,timeout]);
     if(error)throw error;
@@ -133,7 +140,7 @@ async function confirmOrder(e){
   const order={id:"ELET-"+Date.now().toString(36).toUpperCase(),createdAt:new Date().toISOString(),status:"novo",payment:$("#payment").value,freight:state.freight,totalProducts:total,grandTotal:total+state.freight.price,weight:specs().weight,buyer,items:state.items.map(i=>({code:i.code,name:i.name,sale:money(i.price),qty:i.qty}))};
   const btn=e.submitter;btn.disabled=true;btn.textContent="Registrando pedido...";
   try{
-    const {data,error}=await supabase.functions.invoke("create-order",{body:order});
+    const {data,error}=await invokeFunction("create-order",order);
     if(error||data?.ok!==true)throw error||new Error(data?.error||"Falha ao registrar pedido");
     const lines=order.items.map(i=>`${i.qty}x ${i.name} — ${i.sale}`).join("\n");
     const msg=`Olá! Quero confirmar o pedido ${order.id}.\n\n${lines}\n\nProdutos: ${money(order.totalProducts)}\nFrete: ${money(order.freight.price)} (${order.freight.days} dias úteis)\nTotal: ${money(order.grandTotal)}\n\nCliente: ${buyer.name}\nWhatsApp: ${buyer.phone}\nEndereço: ${buyer.address}, ${buyer.number} — ${buyer.neighborhood} — ${buyer.city}\nCEP: ${buyer.cep}\nPagamento: ${order.payment}`;
