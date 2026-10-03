@@ -1,4 +1,4 @@
-const CACHE="eletroshopp-final-v10";
+const CACHE="eletroshopp-final-v11";
 const CORE=["./","./index.html","./manifest.webmanifest"];
 
 async function networkFirst(req){
