@@ -133,6 +133,84 @@
     return null;
   }
 
+  function cepDestino(){
+    const els=[...document.querySelectorAll("input")];
+    const hit=els.find(x=>/cep|postal/i.test((x.id||"")+" "+(x.name||"")+" "+(x.placeholder||"")));
+    if(hit)return String(hit.value||"").replace(/\\D/g,"");
+    const any=els.find(x=>/^\\d{5}-?\\d{3}$/.test(String(x.value||"").trim()));
+    return any?String(any.value).replace(/\\D/g,""):"";
+  }
+
+  function freightBox(){
+    const direct=document.getElementById("freightResults")||document.getElementById("eletroFreightResults");
+    if(direct)return direct;
+    const leaf=[...document.querySelectorAll("body *")].find(x=>x.children.length===0&&/Consultando tarifas reais/i.test(x.textContent||""));
+    return leaf?.parentElement||null;
+  }
+
+  function shippingProducts(){
+    return cart.map((p,i)=>({
+      id:p.id??p.code??i+1,
+      code:p.code??"",
+      name:p.name??"Produto",
+      width:Number(p.width??p.largura??p.shipping_width)||8,
+      height:Number(p.height??p.altura??p.shipping_height)||4,
+      length:Number(p.length??p.comprimento??p.shipping_length)||20,
+      weight:Number(p.weight??p.peso??p.shipping_weight)||0.30,
+      value:price(p),
+      quantity:qty(p._qty),
+      category:p.category||"Eletrônicos"
+    }));
+  }
+
+  async function realFreightQuote(){
+    const box=freightBox();
+    if(!cart.length){if(box)box.innerHTML='<div class="freight-error">Adicione um produto ao carrinho.</div>';return;}
+    const to=cepDestino();
+    if(!/^\\d{8}$/.test(to)){if(box)box.innerHTML='<div class="freight-error">Informe um CEP de destino válido.</div>';return;}
+    if(box)box.innerHTML='<div class="loading">⏳ Consultando tarifas reais...</div>';
+    const products=shippingProducts();
+    const weight=products.reduce((s,p)=>s+p.weight*p.quantity,0);
+    const payload={fromPostalCode:"84272402",toPostalCode:to,products};
+    try{
+      const controller=new AbortController();
+      const timer=setTimeout(()=>controller.abort(),28000);
+      let response;
+      try{
+        response=await fetch("https://sybxbyaywznbwipbssso.supabase.co/functions/v1/frenet-quote",{
+          method:"POST",
+          headers:{
+            "Content-Type":"application/json",
+            "Accept":"application/json",
+            "apikey":"sb_publishable_3iXGUzzTaypiGou7K7UFEw_OW1qKljR",
+            "Authorization":"Bearer sb_publishable_3iXGUzzTaypiGou7K7UFEw_OW1qKljR"
+          },
+          body:JSON.stringify(payload),
+          signal:controller.signal
+        });
+      }finally{clearTimeout(timer);}
+      const raw=await response.text();
+      let data;try{data=raw?JSON.parse(raw):{};}catch{data={message:raw};}
+      if(!response.ok)throw new Error(data?.error||data?.message||("HTTP "+response.status));
+      const opts=Array.isArray(data?.quotes)?data.quotes:[];
+      if(!opts.length)throw new Error(data?.error||"Nenhuma opção de envio encontrada.");
+      window.__ESH_FREIGHT_OPTIONS=opts;
+      if(window.state)window.state.freight=null;
+      if(box)box.innerHTML=opts.map((o,i)=>'<button type="button" class="freight-option" data-esh-freight="'+i+'"><span><b>🚚 '+(o.company?o.company+" — ":"")+(o.name||"Frete")+'</b><small>'+(o.days??"consulte")+' dias úteis</small></span><strong>'+money(o.price)+'</strong></button>').join("");
+      box?.querySelectorAll("[data-esh-freight]").forEach(btn=>btn.addEventListener("click",()=>{
+        const o=window.__ESH_FREIGHT_OPTIONS[Number(btn.dataset.eshFreight)];
+        if(window.state)window.state.freight={id:String(o.id||o.name||"frete"),name:o.name||"Frete",company:o.company||"",price:Number(o.price),days:o.days??"",carrierCode:o.carrierCode||""};
+        box.querySelectorAll("[data-esh-freight]").forEach(x=>x.classList.remove("selected"));btn.classList.add("selected");
+        if(typeof updateSummary==="function")try{updateSummary()}catch(_){}
+      }));
+      const weightEl=[...document.querySelectorAll("*")].find(x=>/Peso estimado do pacote/i.test(x.textContent||"")&&x.children.length);
+      if(weightEl)weightEl.textContent="📦 Peso estimado do pacote "+weight.toFixed(2).replace(".",",")+" kg";
+    }catch(e){
+      console.error("Eletroshopp Frenet",e);
+      if(box)box.innerHTML='<div class="freight-error">Falha ao calcular o frete: '+String(e?.message||"erro desconhecido")+'</div>';
+    }
+  }
+
   document.addEventListener("click",function(e){
     const q=e.target.closest&&e.target.closest("[data-esh-qty]");
     if(q){
@@ -147,6 +225,8 @@
       window.removeEletroCartItem(Number(rm.getAttribute("data-esh-remove")));
       return;
     }
+    const quote=e.target.closest&&e.target.closest("#quoteFreight");
+    if(quote){e.preventDefault();e.stopImmediatePropagation();realFreightQuote();return;}
     const b=e.target.closest&&e.target.closest("button");
     if(!b)return;
     const label=(b.innerText||b.textContent||"").trim().toLowerCase();
