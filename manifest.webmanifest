@@ -1,1 +1,36 @@
-{"name":"Eletroshopp — Tecnologia e Acessórios","short_name":"Eletroshopp","start_url":"./?app=1","scope":"./","display":"standalone","orientation":"portrait-primary","background_color":"#071a33","theme_color":"#e30613","description":"Eletroshopp — smartwatches, fones, ferramentas e acessórios.","categories":["shopping","electronics"],"icons":[{"src":"./icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},{"src":"./icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}
+{
+  "name": "Eletroshopp — Tecnologia e Acessórios",
+  "short_name": "Eletroshopp",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#050a12",
+  "theme_color": "#e31b23",
+  "description": "Eletroshopp — smartwatches, fones, ferramentas e acessórios.",
+  "categories": [
+    "shopping",
+    "electronics"
+  ],
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Abrir loja",
+      "short_name": "Loja",
+      "url": "./"
+    }
+  ]
+}
