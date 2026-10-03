@@ -1,4 +1,4 @@
-const CACHE="eletroshopp-final-v12";
+const CACHE="eletroshopp-final-v13";
 const CORE=["./","./index.html","./manifest.webmanifest"];
 
 self.addEventListener("install",event=>{
