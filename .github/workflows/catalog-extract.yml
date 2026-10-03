@@ -16,43 +16,29 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import re, json, html
-          from collections import Counter
+          import re, json
           s=Path("index.html").read_text(encoding="utf-8",errors="ignore")
-          report={"bytes":len(s.encode("utf-8"))}
-          report["markers"]={}
-          for p in [r'(?i)(?:const|let|var)\\s+(?:products|produtos|catalogo|catalog|items|itens)\\s*=',r'(?i)products\\s*[:=]',r'(?i)produtos\\s*[:=]',r'(?i)catalog(?:o)?\\s*[:=]',r'(?i)price\\s*[:=]',r'(?i)pre[cç]o\\s*[:=]']:
-            m=re.search(p,s)
-            report["markers"][p]={"found":bool(m),"position":m.start() if m else None}
-          classes=[]
-          for m in re.finditer(r'class=["\\\']([^"\\\']+)["\\\']',s,re.I):
-            classes.extend(m.group(1).split())
-          report["classes"]=dict(Counter(c for c in classes if re.search(r'(?i)(product|produto|item|card|catalog)',c)).most_common(100))
-          imgs=[]
-          for m in re.finditer(r'<img\\b([^>]+)>',s,re.I|re.S):
-            a=m.group(1)
-            def get(n):
-              x=re.search(r'(?i)\\b'+n+r'\\s*=\\s*["\\\']([^"\\\']*)["\\\']',a)
-              return html.unescape(x.group(1)) if x else ""
-            v={"src":get("src") or get("data-src") or get("data-image"),"alt":get("alt")}
-            if v not in imgs and (v["src"] or v["alt"]): imgs.append(v)
-          report["images"]=imgs[:1000]
-          prices=[]
-          for p in re.findall(r'R\\$\\s*[0-9]{1,3}(?:\\.[0-9]{3})*,[0-9]{2}|[0-9]{1,3}(?:\\.[0-9]{3})*,[0-9]{2}',s):
-            if p not in prices: prices.append(p)
-          report["prices"]=prices[:500]
-          snippets=[]
-          for marker in ["const products","const produtos","products =","produtos ="]:
+          report={"bytes":len(s.encode("utf-8")),"assignment_snippets":[],"code_samples":[]}
+          tokens=["const products","let products","var products","products =","products=","produtos =","produtos="]
+          seen=set()
+          for token in tokens:
             start=0
             while True:
-              pos=s.lower().find(marker.lower(),start)
+              pos=s.lower().find(token.lower(),start)
               if pos<0: break
-              snippets.append({"marker":marker,"position":pos,"text":s[max(0,pos-1000):pos+5000]})
-              start=pos+len(marker)
-              if len(snippets)>=100: break
-          report["snippets"]=snippets
+              key=(token,pos)
+              if key not in seen:
+                report["assignment_snippets"].append({"token":token,"position":pos,"text":s[max(0,pos-300):pos+3000]})
+                seen.add(key)
+              start=pos+len(token)
+              if len(report["assignment_snippets"])>=80: break
+            if len(report["assignment_snippets"])>=80: break
+          for m in re.finditer(r'["\\\']?code["\\\']?\\s*[:=]\\s*["\\\']([^"\\\']+)["\\\']',s,re.I):
+            pos=m.start()
+            report["code_samples"].append({"code":m.group(1),"position":pos,"text":s[max(0,pos-250):pos+1200]})
+            if len(report["code_samples"])>=120: break
           Path("catalog-debug.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
-          print(json.dumps({"bytes":report["bytes"],"images":len(report["images"]),"prices":len(report["prices"]),"classes":len(report["classes"]),"snippets":len(report["snippets"])}))
+          print("assignments",len(report["assignment_snippets"]),"codes",len(report["code_samples"]))
           PY
 
       - name: Commit diagnostics
