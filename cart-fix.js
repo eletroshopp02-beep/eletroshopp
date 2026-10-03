@@ -1,70 +1,181 @@
 (function(){
-  const CART_KEY='eletroshopp_cart_v2';
-  const getProducts=()=>{try{return products||[]}catch(e){return []}};
-  const loadSaved=()=>{
+  "use strict";
+
+  const KEY="eletro_cart_v2";
+  const LEGACY_KEY="eletroshopp_cart_v2";
+
+  function getProducts(){
+    try{return Array.isArray(products)?products:[];}catch(e){return [];}
+  }
+  function qty(v){return Math.max(1,Math.min(99,Number(v)||1));}
+  function money(v){
+    const n=Number(v)||0;
+    return n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+  }
+  function price(p){
+    const raw=String(p&&p.sale||"").trim().replace(/[^0-9,.-]/g,"");
+    const normalized=raw.includes(",")?raw.replace(/\./g,"").replace(",","."):raw;
+    return Number.parseFloat(normalized)||0;
+  }
+  function save(){
+    try{localStorage.setItem(KEY,JSON.stringify(cart));}catch(e){console.warn("Eletroshopp: não foi possível salvar o carrinho",e);}
+  }
+  function load(){
+    let raw=[];
     try{
-      const saved=JSON.parse(localStorage.getItem(CART_KEY)||'[]');
-      const list=getProducts();
-      return saved.map(s=>{const p=list.find(x=>String(x.code)===String(s.code));return p?Object.assign({},p,{_qty:Math.max(1,Number(s.qty)||1}):null}).filter(Boolean);
-    }catch(e){return []}
-  };
-  const persist=()=>{
-    try{localStorage.setItem(CART_KEY,JSON.stringify(cart.map(p=>({code:p.code,qty:p._qty||1})))}catch(e){}
-  };
-  const sync=()=>{
-    try{cart=Array.isArray(cart)?cart:loadSaved()}catch(e){}
-    try{persist()}catch(e){}
-    if(typeof window.updateEletroCart==='function')window.updateEletroCart();
-  };
-  try{
-    const saved=loadSaved();
-    if(saved.length){cart=saved;}
-  }catch(e){console.warn('Carrinho salvo',e)}
-  const originalUpdate=window.updateEletroCart;
-  window.updateEletroCart=function(){
+      raw=JSON.parse(localStorage.getItem(KEY)||"[]");
+      if(!Array.isArray(raw)||!raw.length){
+        const legacy=JSON.parse(localStorage.getItem(LEGACY_KEY)||"[]");
+        if(Array.isArray(legacy)&&legacy.length)raw=legacy;
+      }
+    }catch(e){raw=[];}
+    const list=getProducts();
+    return raw.map(item=>{
+      const code=String(item&&item.code||"");
+      const p=list.find(x=>String(x.code)===code);
+      if(!p)return null;
+      return Object.assign({},p,{_qty:qty(item._qty??item.qty)});
+    }).filter(Boolean);
+  }
+  function setCount(n){
+    const top=document.getElementById("cart");
+    const floating=document.getElementById("cartFloatCount");
+    if(top)top.textContent="🛒 Carrinho ("+n+")";
+    if(floating)floating.textContent=String(n);
+  }
+  function render(){
     try{
-      const n=cart.reduce((s,p)=>s+(Number(p._qty)||1),0);
-      const c=document.getElementById('cartFloatCount'); if(c)c.textContent=n;
-      const top=document.getElementById('cart'); if(top)top.textContent='🛒 Carrinho ('+n+')';
-      const box=document.getElementById('eletroCartItems'), totalEl=document.getElementById('eletroCartTotal');
+      const n=cart.reduce((sum,p)=>sum+qty(p._qty),0);
+      setCount(n);
+      const box=document.getElementById("eletroCartItems");
+      const totalEl=document.getElementById("eletroCartTotal");
       if(!box||!totalEl)return;
-      if(!cart.length){box.innerHTML='<div class="emptycart">Seu carrinho está vazio.<br>Adicione produtos para continuar.</div>';totalEl.textContent='Total dos produtos: R$ 0,00';return;}
-      box.innerHTML=cart.map((p,i)=>'<div class="cart-line"><img src="'+String(p.image||'')+'" alt=""><div class="cart-product-info"><b>'+String(p.name||'')+'</b><div style="color:#2196f3;font-weight:900">'+String(p.sale||'')+'</div></div><div class="qty"><button type="button" onclick="changeEletroQty('+i+',-1)">−</button><b>'+(p._qty||1)+'</b><button type="button" onclick="changeEletroQty('+i+',1)">+</button></div><button class="remove-item" title="Excluir produto" onclick="removeEletroCartItem('+i+')">🗑️</button></div>').join('');
-      const total=cart.reduce((s,p)=>s+eprice(p)*(p._qty||1),0);
-      totalEl.textContent='Total dos produtos: '+total.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-      if(typeof updateWeightLabel==='function')updateWeightLabel();
-    }catch(e){console.error('Carrinho:',e)}
+      if(!cart.length){
+        box.innerHTML='<div class="emptycart">Seu carrinho está vazio.<br>Adicione produtos para continuar.</div>';
+        totalEl.textContent="Total dos produtos: R$ 0,00";
+        return;
+      }
+      box.innerHTML=cart.map((p,i)=>'<div class="cart-line"><img src="'+String(p.image||"")+'" alt=""><div class="cart-product-info"><b>'+String(p.name||"")+'</b><div class="esh-cart-price">'+String(p.sale||"")+'</div></div><div class="qty"><button type="button" data-esh-qty="'+i+'|−">−</button><b>'+qty(p._qty)+'</b><button type="button" data-esh-qty="'+i+'|+">+</button></div><button type="button" class="remove-item" data-esh-remove="'+i+'" title="Excluir produto">🗑️</button></div>').join("");
+      const total=cart.reduce((sum,p)=>sum+price(p)*qty(p._qty),0);
+      totalEl.textContent="Total dos produtos: "+money(total);
+      if(typeof updateWeightLabel==="function")try{updateWeightLabel();}catch(_){}
+    }catch(e){console.error("Eletroshopp carrinho:",e);}
+  }
+
+  function add(code,amount){
+    const key=String(code||"");
+    const p=getProducts().find(x=>String(x.code)===key);
+    if(!p||p.soldout){return false;}
+    const q=qty(amount);
+    const item=cart.find(x=>String(x.code)===key);
+    if(item)item._qty=Math.min(99,qty(item._qty)+q);
+    else cart.push(Object.assign({},p,{_qty:q}));
+    save();
+    render();
+    return true;
+  }
+
+  window.__eletroAddToCart=function(code,amount){
+    const ok=add(code,amount||1);
+    if(ok&&typeof showEletroToast==="function")showEletroToast((amount||1)>1?String(amount)+" unidades adicionadas ao carrinho!":"Produto adicionado ao carrinho!");
+    return ok;
   };
-  window.add=function(code){
-    const p=getProducts().find(x=>String(x.code)===String(code));
-    if(!p||p.soldout)return;
-    const item=cart.find(x=>String(x.code)===String(code));
-    if(item)item._qty=(Number(item._qty)||1)+1;
-    else cart.push(Object.assign({},p,{_qty:1}));
-    persist();window.updateEletroCart();
+  window.add=function(code){return window.__eletroAddToCart(code,1);};
+  window.addQuantityToCart=function(code,amount){return window.__eletroAddToCart(code,amount||1);};
+  window.addDirectToCart=function(code){
+    const ok=window.__eletroAddToCart(code,1);
+    if(ok&&typeof openEletroCart==="function")openEletroCart();
+    return ok;
   };
-  window.addQuantityToCart=function(code,qty){for(let i=0;i<Math.max(1,Number(qty)||1);i++)window.add(code)};
+  window.addFromDetail=function(code){
+    const amount=typeof getDetailQty==="function"?getDetailQty():1;
+    const ok=window.__eletroAddToCart(code,amount);
+    if(!ok)return false;
+    if(typeof closeProductDetail==="function")closeProductDetail();
+    if(typeof openEletroCart==="function")openEletroCart();
+    return true;
+  };
+  window.buyNowFromDetail=function(code){return window.addFromDetail(code);};
+
   window.changeEletroQty=function(i,d){
     if(!cart[i])return;
-    cart[i]._qty=(Number(cart[i]._qty)||1)+Number(d||0);
+    cart[i]._qty=qty(cart[i]._qty)+Number(d||0);
     if(cart[i]._qty<=0)cart.splice(i,1);
-    persist();if(typeof invalidateFreight==='function')invalidateFreight();window.updateEletroCart();
+    save();render();
+    if(typeof invalidateFreight==="function")try{invalidateFreight();}catch(_){}
   };
   window.removeEletroCartItem=function(i){
-    if(!cart[i])return;cart.splice(i,1);persist();if(typeof invalidateFreight==='function')invalidateFreight();window.updateEletroCart();
+    if(!cart[i])return;
+    cart.splice(i,1);save();render();
+    if(typeof invalidateFreight==="function")try{invalidateFreight();}catch(_){}
   };
   window.clearEletroCart=function(){
-    cart=[];try{localStorage.removeItem(CART_KEY)}catch(e){}
-    if(typeof selectedFreight!=='undefined')selectedFreight=null;
-    if(typeof invalidateFreight==='function')invalidateFreight();
-    window.updateEletroCart();
+    cart.length=0;
+    try{localStorage.removeItem(KEY);localStorage.removeItem(LEGACY_KEY);}catch(_){}
+    render();
+    if(typeof invalidateFreight==="function")try{invalidateFreight();}catch(_){}
   };
   window.openEletroCart=function(){
-    window.updateEletroCart();
-    const el=document.getElementById('eletroCart');if(el)el.classList.add('open');
+    render();
+    const el=document.getElementById("eletroCart");
+    if(el)el.classList.add("open");
   };
-  window.closeEletroCart=function(){const el=document.getElementById('eletroCart');if(el)el.classList.remove('open')};
-  const btn=document.getElementById('cart');if(btn)btn.onclick=()=>window.openEletroCart();
-  const float=document.getElementById('cartFloat');if(float)float.onclick=()=>window.openEletroCart();
-  window.updateEletroCart();
+  window.closeEletroCart=function(){
+    const el=document.getElementById("eletroCart");
+    if(el)el.classList.remove("open");
+  };
+
+  function codeFromElement(el){
+    let n=el;
+    for(let depth=0;n&&depth<8;depth++,n=n.parentElement){
+      const direct=n.getAttribute&&n.getAttribute("data-code");
+      if(direct)return direct;
+      const onclick=n.getAttribute&&n.getAttribute("onclick")||"";
+      const m=onclick.match(/(?:addDirectToCart|addFromDetail|buyNowFromDetail|addQuantityToCart|add|openProductDetail)\s*\(\s*['"]([^'"]+)['"]/i);
+      if(m)return m[1];
+    }
+    return null;
+  }
+
+  document.addEventListener("click",function(e){
+    const q=e.target.closest&&e.target.closest("[data-esh-qty]");
+    if(q){
+      const [i,d]=q.getAttribute("data-esh-qty").split("|");
+      e.preventDefault();e.stopPropagation();
+      window.changeEletroQty(Number(i),d==="+"?1:-1);
+      return;
+    }
+    const rm=e.target.closest&&e.target.closest("[data-esh-remove]");
+    if(rm){
+      e.preventDefault();e.stopPropagation();
+      window.removeEletroCartItem(Number(rm.getAttribute("data-esh-remove")));
+      return;
+    }
+
+    const b=e.target.closest&&e.target.closest("button");
+    if(!b)return;
+    const label=(b.innerText||b.textContent||"").trim().toLowerCase();
+    if(!/adicionar ao carrinho|comprar agora/.test(label))return;
+
+    const code=codeFromElement(b);
+    if(!code)return;
+
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    window.__eletroAddToCart(code,1);
+    if(typeof openEletroCart==="function")openEletroCart();
+  },true);
+
+  function boot(){
+    try{
+      const loaded=load();
+      cart.length=0;
+      loaded.forEach(x=>cart.push(x));
+      save();
+      render();
+    }catch(e){console.error("Eletroshopp boot:",e);}
+  }
+
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});
+  else boot();
 })();
