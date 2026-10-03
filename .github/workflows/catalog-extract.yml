@@ -12,33 +12,58 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Analyze legacy catalog
+      - name: Extract product array
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import re, json
+          import json,re
           s=Path("index.html").read_text(encoding="utf-8",errors="ignore")
-          report={"bytes":len(s.encode("utf-8")),"assignment_snippets":[],"code_samples":[]}
-          tokens=["const products","let products","var products","products =","products=","produtos =","produtos="]
-          seen=set()
-          for token in tokens:
-            start=0
-            while True:
-              pos=s.lower().find(token.lower(),start)
-              if pos<0: break
-              key=(token,pos)
-              if key not in seen:
-                report["assignment_snippets"].append({"token":token,"position":pos,"text":s[max(0,pos-300):pos+3000]})
-                seen.add(key)
-              start=pos+len(token)
-              if len(report["assignment_snippets"])>=80: break
-            if len(report["assignment_snippets"])>=80: break
-          for m in re.finditer(r'["\\\']?code["\\\']?\\s*[:=]\\s*["\\\']([^"\\\']+)["\\\']',s,re.I):
-            pos=m.start()
-            report["code_samples"].append({"code":m.group(1),"position":pos,"text":s[max(0,pos-250):pos+1200]})
-            if len(report["code_samples"])>=120: break
-          Path("catalog-debug.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
-          print("assignments",len(report["assignment_snippets"]),"codes",len(report["code_samples"]))
+          marker="let products=["
+          start=s.find(marker)
+          if start<0:
+            raise SystemExit("Declaração let products=[ não encontrada")
+          start+=len("let products=")
+          depth=0
+          quote=None
+          esc=False
+          end=None
+          for i,ch in enumerate(s[start:],start):
+            if quote:
+              if esc:
+                esc=False
+              elif ch=="\\": 
+                esc=True
+              elif ch==quote:
+                quote=None
+              continue
+            if ch in ('"',"'"):
+              quote=ch
+            elif ch=="[":
+              depth+=1
+            elif ch=="]":
+              depth-=1
+              if depth==0:
+                end=i
+                break
+          if end is None:
+            raise SystemExit("Fim do array products não encontrado")
+          raw=s[start:end+1]
+          try:
+            data=json.loads(raw)
+          except Exception:
+            raw2=re.sub(r',\\s*([}\\]])',r'\\1',raw)
+            data=json.loads(raw2)
+          if not isinstance(data,list) or not data:
+            raise SystemExit("Array de produtos vazio ou inválido")
+          # Normaliza somente a estrutura; mantém imagens e dados existentes.
+          out=[]
+          for p in data:
+            if isinstance(p,dict):
+              out.append(p)
+          Path("products-extracted.json").write_text(json.dumps(out,ensure_ascii=False,indent=2),encoding="utf-8")
+          print("PRODUTOS_EXTRAIDOS",len(out))
+          print("PRIMEIRO",out[0].get("code"),out[0].get("name"),out[0].get("sale"))
+          print("ULTIMO",out[-1].get("code"),out[-1].get("name"),out[-1].get("sale"))
           PY
 
       - name: Commit diagnostics
