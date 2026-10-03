@@ -1152,10 +1152,10 @@ let deferredPrompt=null;
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;const b=document.getElementById("installApp");if(b)b.style.display="inline-flex";const s=document.getElementById("pwaStatus");if(s)s.textContent="Aplicativo pronto para instalar no celular."});
 window.addEventListener("appinstalled",()=>{deferredPrompt=null;const b=document.getElementById("installApp");if(b){b.textContent="✓ Aplicativo instalado";b.disabled=true}});
 document.addEventListener("click",async e=>{const b=e.target.closest&&e.target.closest("#installApp");if(!b)return;if(deferredPrompt){try{await deferredPrompt.prompt();await deferredPrompt.userChoice}catch(_){}deferredPrompt=null}else{const st=document.getElementById("pwaStatus");if(st)st.textContent="Use o menu ⋮ do navegador e escolha “Instalar aplicativo” ou “Adicionar à tela inicial”."}});
-if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js",{updateViaCache:"none"}).then(r=>{try{r.update()}catch(_){} }).catch(e=>console.warn("PWA:",e)));
+if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=21",{updateViaCache:"none"}).then(r=>{try{r.update()}catch(_){} }).catch(e=>console.warn("PWA:",e)));
 })();
 </script>
-<script src="cart-fix.js"></script><style id="eletroProfessionalTheme">
+<script src="cart-fix.js?v=15"></script><style id="eletroProfessionalTheme">
 :root{--es-red:#e31b23;--es-red-dark:#b91019;--es-blue:#0b5ed7;--es-blue-dark:#083b8f;--es-bg:#050a12;--es-panel:#0b1320;--es-line:#1d304b;--es-text:#f7f9fc;--es-muted:#9eacc0}
 body{background:radial-gradient(circle at 15% -10%,rgba(11,94,215,.20),transparent 30%),radial-gradient(circle at 90% 0%,rgba(227,27,35,.16),transparent 28%),var(--es-bg)!important;color:var(--es-text)!important}
 header{background:rgba(5,10,18,.94)!important;border-bottom:2px solid var(--es-red)!important}.logo{color:var(--es-red)!important}.logo span{color:#fff!important}.search{background:#0d1726!important;border-color:#263c5b!important}
