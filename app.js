@@ -55,7 +55,7 @@ function categories(){
 function renderCategories(){
   const el=$("#category");
   el.innerHTML='<option value="">Todas as categorias</option>';
-  categories().forEach(c=>el.insertAdjacentHTML("beforeend",`<option value="${c}">${c}</option>`);
+  categories().forEach(c=>el.insertAdjacentHTML("beforeend",`<option value="${c}">${c}</option>`));
 }
 function filtered(){
   const q=$("#search").value.trim().toLowerCase(), c=$("#category").value;
