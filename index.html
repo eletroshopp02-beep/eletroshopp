@@ -1147,8 +1147,7 @@ window.addDirectToCart=function(code){const ok=window.addQuantityToCart(code,1);
 window.addFromDetail=function(code){const q=typeof getDetailQty==="function"?getDetailQty():1;const ok=window.addQuantityToCart(code,q);if(!ok)return false;if(typeof closeProductDetail==="function")closeProductDetail();if(typeof openEletroCart==="function")openEletroCart();if(typeof showEletroToast==="function")showEletroToast(q===1?"Produto adicionado ao carrinho!":q+" unidades adicionadas ao carrinho!");return true};
 window.buyNowFromDetail=function(code){const q=typeof getDetailQty==="function"?getDetailQty():1;const ok=window.addQuantityToCart(code,q);if(!ok)return false;if(typeof closeProductDetail==="function")closeProductDetail();if(typeof openEletroCart==="function")openEletroCart();return true};
 normalize();
-function closeSplash(){const e=document.getElementById("eshSplash");if(!e)return;setTimeout(()=>e.classList.add("hide"),850);setTimeout(()=>e.remove(),1250)}
-if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",closeSplash,{once:true});else closeSplash();
+
 let deferredPrompt=null;
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;const b=document.getElementById("installApp");if(b)b.style.display="inline-flex";const s=document.getElementById("pwaStatus");if(s)s.textContent="Aplicativo pronto para instalar no celular."});
 window.addEventListener("appinstalled",()=>{deferredPrompt=null;const b=document.getElementById("installApp");if(b){b.textContent="✓ Aplicativo instalado";b.disabled=true}});
