@@ -30,7 +30,7 @@ function normalize(p){
     price:priceOf(p),
     image:String(p.image||""),
     category:categoryOf(p),
-    soldout:Boolean(p.soldout||p.esgotado||p.stock===0||String(p.status||"").toLowerCase().includes("esgot")),
+    soldout:Boolean(p.soldout||p.esgotado||p.stock===0||!p.sale||String(p.status||"").toLowerCase().includes("esgot")),
     weight:Number(p.weight)||0.35,
     raw:p
   };
