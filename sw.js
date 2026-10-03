@@ -1,5 +1,5 @@
-const CACHE="eletroshopp-final-v13";
-const CORE=["./","./index.html","./manifest.webmanifest"];
+const CACHE="eletroshopp-final-v14";
+const CORE=["./","./index.html","./manifest.webmanifest","./app.js","./cart-fix.js"];
 
 self.addEventListener("install",event=>{
   event.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));
