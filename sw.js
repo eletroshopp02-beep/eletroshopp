@@ -1,4 +1,4 @@
-const CACHE="eletroshopp-final-v16";
+const CACHE="eletroshopp-final-v17";
 const CORE=["./","./index.html","./manifest.webmanifest","./app.js","./cart-fix.js"];
 
 self.addEventListener("install",event=>{
@@ -26,7 +26,7 @@ self.addEventListener("fetch",event=>{
   if(event.request.method!=="GET")return;
   const u=new URL(event.request.url);
   if(u.origin!==location.origin)return;
-  if(u.pathname.endsWith("/sw.js")||event.request.mode==="navigate"||u.pathname.endsWith("/index.html")||u.pathname.endsWith("/")){
+  if(u.pathname.endsWith("/sw.js")||event.request.mode==="navigate"||u.pathname.endsWith("/index.html")||u.pathname.endsWith("/")||u.pathname.endsWith("/app.js")||u.pathname.endsWith("/cart-fix.js")){
     event.respondWith(networkFirst(event.request));return;
   }
   event.respondWith(caches.match(event.request).then(cached=>{
