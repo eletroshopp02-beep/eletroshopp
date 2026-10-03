@@ -14,7 +14,7 @@ import android.webkit.WebViewClient;
 
 public class MainActivity extends Activity {
     private WebView webView;
-    private static final String HOME = "https://eletroshopp.com.br/";
+    private static final String HOME = "https://eletroshopp.com.br/?app=20261003";
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
