@@ -38,7 +38,7 @@ function normalize(p){
     image:String(p.image||""),
     category:categoryOf(p),
     soldout:Boolean(p.soldout||p.esgotado||p.stock===0||!p.sale||String(p.status||"").toLowerCase().includes("esgot")),
-    weight:Number(p.weight)||0.35,
+    weight:Number(p.weight)||0.35,\n    width:Number(p.width)||8,\n    height:Number(p.height)||4,\n    length:Number(p.length)||20,
     raw:p
   };
 }
