@@ -5,14 +5,23 @@ const $=s=>document.querySelector(s);
 const money=v=>new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(Number(v)||0);
 const state={products:[],items:JSON.parse(localStorage.getItem("eletroshopp-cart")||"[]"),freight:null};
 async function invokeFunction(name,body){
-  const r=await fetch(SUPABASE_URL+"/functions/v1/"+name,{
-    method:"POST",
-    headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY},
-    body:JSON.stringify(body)
-  });
-  let data=null;try{data=await r.json();}catch{}
-  if(!r.ok)throw new Error(data?.error||data?.message||("HTTP "+r.status));
-  return {data,error:null};
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),28000);
+  try{
+    const r=await fetch(SUPABASE_URL+"/functions/v1/"+name,{
+      method:"POST",
+      headers:{"Content-Type":"application/json","Accept":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY},
+      body:JSON.stringify(body),
+      signal:controller.signal
+    });
+    const raw=await r.text();
+    let data=null;try{data=raw?JSON.parse(raw):null;}catch{data={message:raw};}
+    if(!r.ok)throw new Error(data?.error||data?.message||("HTTP "+r.status));
+    return {data,error:null};
+  }catch(e){
+    if(e?.name==="AbortError")throw new Error("A cotação excedeu 28 segundos. A conexão com o servidor de frete não respondeu.");
+    throw e;
+  }finally{clearTimeout(timer);}
 }
 
 function priceOf(p){
@@ -131,9 +140,7 @@ async function quoteFreight(){
   try{
     const s=specs();
     const payload={fromPostalCode:"84272402",toPostalCode:cep,products:s.products};
-    const request=invokeFunction("frenet-quote",payload);
-    const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error("TIMEOUT")),30000));
-    const {data,error}=await Promise.race([request,timeout]);
+    const {data,error}=await invokeFunction("frenet-quote",payload);
     if(error)throw error;
     const opts=Array.isArray(data?.quotes)?data.quotes:[];
     if(!opts.length)throw new Error(data?.error||"Nenhuma opção de envio encontrada.");
@@ -160,27 +167,12 @@ async function confirmOrder(e){
   try{
     const {data,error}=await invokeFunction("create-order",order);
     if(error||data?.ok!==true)throw error||new Error(data?.error||"Falha ao registrar pedido");
-    const lines=order.items.map(i=>`${i.qty}x ${i.name} — ${i.sale}`).join("
-");
-    const msg=`Olá! Quero confirmar o pedido ${order.id}.
-
-${lines}
-
-Produtos: ${money(order.totalProducts)}
-Frete: ${money(order.freight.price)} (${order.freight.days} dias úteis)
-Total: ${money(order.grandTotal)}
-
-Cliente: ${buyer.name}
-WhatsApp: ${buyer.phone}
-Endereço: ${buyer.address}, ${buyer.number} — ${buyer.neighborhood} — ${buyer.city}
-CEP: ${buyer.cep}
-Pagamento: ${order.payment}`;
+    const lines=order.items.map(i=>`${i.qty}x ${i.name} — ${i.sale}`).join("\n");
+    const msg=`Olá! Quero confirmar o pedido ${order.id}.\n\n${lines}\n\nProdutos: ${money(order.totalProducts)}\nFrete: ${money(order.freight.price)} (${order.freight.days} dias úteis)\nTotal: ${money(order.grandTotal)}\n\nCliente: ${buyer.name}\nWhatsApp: ${buyer.phone}\nEndereço: ${buyer.address}, ${buyer.number} — ${buyer.neighborhood} — ${buyer.city}\nCEP: ${buyer.cep}\nPagamento: ${order.payment}`;
     localStorage.removeItem("eletroshopp-cart");window.location.href="https://wa.me/"+WA+"?text="+encodeURIComponent(msg);
   }catch(err){
     console.error(err);
-    alert("Não foi possível registrar o pedido. Ele não foi enviado ao WhatsApp.
-
-"+(err.message||"Tente novamente."));
+    alert("Não foi possível registrar o pedido. Ele não foi enviado ao WhatsApp.\n\n"+(err.message||"Tente novamente."));
     btn.disabled=false;btn.textContent="Confirmar pedido e abrir WhatsApp";
   }
 }
