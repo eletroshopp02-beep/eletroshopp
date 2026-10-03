@@ -88,17 +88,20 @@ function closeCheckout(){$("#checkoutModal").classList.remove("open");$("#checko
 function cleanCep(v){return String(v||"").replace(/\D/g,"").slice(0,8);}
 function formatCep(v){const c=cleanCep(v);return c.length>5?c.slice(0,5)+"-"+c.slice(5):c;}
 function specs(){
-  const products=state.items.map(i=>({
-    id:i.id,
-    code:i.code,
-    width:Number(i.width)||8,
-    height:Number(i.height)||4,
-    length:Number(i.length)||20,
-    weight:Number(i.weight)||0.30,
-    value:Number(i.price)||0,
-    quantity:Math.max(1,Number(i.qty)||1),
-    category:"Eletrônicos"
-  }));
+  const products=state.items.map(i=>{
+    const p=state.products.find(x=>String(x.id)===String(i.id)||String(x.code)===String(i.code))||{};
+    return {
+      id:i.id,
+      code:i.code,
+      width:Number(i.width)||Number(p.width)||8,
+      height:Number(i.height)||Number(p.height)||4,
+      length:Number(i.length)||Number(p.length)||20,
+      weight:Number(i.weight)||Number(p.weight)||0.30,
+      value:Number(i.price)||Number(p.price)||0,
+      quantity:Math.max(1,Number(i.qty)||1),
+      category:p.category||"Eletrônicos"
+    };
+  });
   const weight=products.reduce((s,p)=>s+p.weight*p.quantity,0);
   return {products,weight:Number(Math.max(.1,weight).toFixed(3))};
 }
@@ -140,7 +143,8 @@ async function quoteFreight(){
     }));
   }catch(e){
     console.error(e);
-    box.innerHTML='<div class="freight-error">Não foi possível calcular o frete agora. Verifique o CEP e tente novamente.</div>';
+    const msg=String(e?.message||"").trim();
+    box.innerHTML='<div class="freight-error">'+(msg||"Não foi possível calcular o frete agora. Verifique o CEP e tente novamente.")+'</div>';
   }
 }
 async function confirmOrder(e){
@@ -167,7 +171,7 @@ document.addEventListener("click",e=>{
   if(id){
     const p=state.products.find(x=>x.id===id);if(!p||p.soldout)return;
     const item=state.items.find(x=>x.id===id);
-    item?item.qty++:state.items.push({id:p.id,code:p.code,name:p.name,price:p.price,weight:p.weight,qty:1});
+    item?item.qty++:state.items.push({id:p.id,code:p.code,name:p.name,price:p.price,weight:p.weight,width:p.width,height:p.height,length:p.length,qty:1});
     saveCart();return;
   }
   if(e.target.closest("#cartButton"))openCart();
