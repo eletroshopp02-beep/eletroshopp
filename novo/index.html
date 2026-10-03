@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b0d10">
+  <title>Eletroshopp</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./">Eletroshopp</a>
+    <button id="cartButton" class="cart" type="button" aria-label="Abrir carrinho">🛒 <span id="cartCount">0</span></button>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <span class="eyebrow">ELETROSHOPP</span>
+        <h1>Eletrônicos e ferramentas para o seu dia a dia.</h1>
+        <p>Catálogo organizado, compra simples e atendimento pelo WhatsApp.</p>
+      </div>
+    </section>
+
+    <section class="toolbar">
+      <input id="search" type="search" placeholder="Buscar produto..." autocomplete="off">
+      <select id="category" aria-label="Categoria">
+        <option value="">Todas as categorias</option>
+      </select>
+    </section>
+
+    <section id="status" class="status">Carregando catálogo...</section>
+    <section id="products" class="grid" aria-live="polite"></section>
+  </main>
+
+  <aside id="cartPanel" class="cart-panel" aria-hidden="true">
+    <div class="cart-head"><h2>Seu carrinho</h2><button id="closeCart" type="button">×</button></div>
+    <div id="cartItems"></div>
+    <div class="cart-total"><span>Total</span><strong id="cartTotal">R$ 0,00</strong></div>
+    <button id="checkout" class="primary" type="button">Continuar pedido</button>
+  </aside>
+
+  <div id="backdrop" class="backdrop"></div>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
