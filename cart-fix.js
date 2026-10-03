@@ -55,6 +55,9 @@ let freightProgressTimer=null;
 function stopFreightProgress(){if(freightProgressTimer){clearInterval(freightProgressTimer);freightProgressTimer=null}}
 function startFreightProgress(box){
   stopFreightProgress();
+  if(!document.getElementById("eshFreightProgressStyle")){
+    const s=document.createElement("style");s.id="eshFreightProgressStyle";s.textContent=".freight-progress-wrap{padding:10px 0}.freight-progress-title{color:#ef233c;font-weight:700;margin-bottom:9px}.freight-progress-track{height:10px;background:rgba(255,255,255,.10);border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.08)}.freight-progress-bar{height:100%;width:4%;background:linear-gradient(90deg,#ff1e2d,#ff5964);border-radius:999px;transition:width .8s ease;box-shadow:0 0 12px rgba(255,30,45,.55)}.freight-progress-text{font-size:13px;opacity:.78;margin-top:8px;text-align:center}";document.head.appendChild(s)
+  }
   if(!box)return;
   box.innerHTML='<div class="freight-progress-wrap"><div class="freight-progress-title">⏳ Consultando tarifas reais...</div><div class="freight-progress-track"><div class="freight-progress-bar" id="eshFreightProgressBar"></div></div><div class="freight-progress-text" id="eshFreightProgressText">Conectando à Frenet...</div></div>';
   let p=4,sec=0;
