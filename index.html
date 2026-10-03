@@ -567,9 +567,16 @@ window.openProductDetail=function(code){
 window.closeProductDetail=function(){document.getElementById('productDetailBackdrop').classList.remove('open')};
 window.getDetailQty=function(){const el=document.getElementById('detailQty');let q=parseInt(el?.value||'1',10);if(!Number.isFinite(q))q=1;return Math.max(1,Math.min(99,q));};
 window.changeDetailQty=function(delta){const el=document.getElementById('detailQty');if(!el)return;el.value=Math.max(1,Math.min(99,(parseInt(el.value||'1',10)||1)+delta));};
-window.addQuantityToCart=function(code,qty){for(let i=0;i<qty;i++)add(code)};
-window.addFromDetail=function(code){const qty=getDetailQty();addQuantityToCart(code,qty);closeProductDetail();showEletroToast(qty===1?'Produto adicionado ao carrinho!':`${qty} unidades adicionadas ao carrinho!`);};
-window.buyNowFromDetail=function(code){const qty=getDetailQty();addQuantityToCart(code,qty);closeProductDetail();openEletroCart();};
+window.addQuantityToCart=function(code,qty){
+ const p=products.find(x=>x.code===code); if(!p||p.soldout)return false;
+ let item=cart.find(x=>x.code===code);
+ const q=Math.max(1,Math.min(99,Number(qty)||1));
+ if(item){item._qty=Math.min(99,(item._qty||1)+q);}else{cart.push({...p,_qty:q});}
+ updateEletroCart();
+ return true;
+};
+window.addFromDetail=function(code){const qty=getDetailQty();const ok=addQuantityToCart(code,qty);if(!ok)return;closeProductDetail();openEletroCart();showEletroToast(qty===1?'Produto adicionado ao carrinho!':`${qty} unidades adicionadas ao carrinho!`);};
+window.buyNowFromDetail=function(code){const qty=getDetailQty();const ok=addQuantityToCart(code,qty);if(!ok)return;closeProductDetail();openEletroCart();};
 document.getElementById('productDetailBackdrop').addEventListener('click',e=>{if(e.target.id==='productDetailBackdrop')closeProductDetail()});
 function showEletroToast(msg){let t=document.getElementById('eletroToast');if(!t){t=document.createElement('div');t.id='eletroToast';t.style.cssText='position:fixed;left:50%;bottom:82px;transform:translateX(-50%);z-index:300;background:#ffd400;color:#000;padding:12px 18px;border-radius:999px;font-weight:900;box-shadow:0 10px 30px #0009;display:none;max-width:90%;text-align:center';document.body.appendChild(t)}t.textContent=msg;t.style.display='block';clearTimeout(window._eletroToastTimer);window._eletroToastTimer=setTimeout(()=>t.style.display='none',2200)}
 let selectedFreight=null;
@@ -717,7 +724,7 @@ window.updateEletroCart=function(){
  box.innerHTML=cart.map((p,i)=>'<div class="cart-line"><img src="'+p.image+'"><div class="cart-product-info"><b>'+p.name+'</b><div style="color:#ffd400;font-weight:900">'+p.sale+'</div></div><div class="qty"><button onclick="changeEletroQty('+i+',-1)">−</button><b>'+(p._qty||1)+'</b><button onclick="changeEletroQty('+i+',1)">+</button></div><button class="remove-item" title="Excluir produto" onclick="removeEletroCartItem('+i+')">🗑️</button></div>').join('');
  const t=cart.reduce((s,p)=>s+eprice(p)*(p._qty||1),0); totalEl.textContent='Total dos produtos: '+t.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 }
-window.add=function(code){let p=products.find(x=>x.code===code);if(!p||p.soldout)return;let x=cart.find(y=>y.code===code);if(x)x._qty=(x._qty||1)+1;else{p._qty=1;cart.push(p)}updateEletroCart()};
+window.add=function(code){return addQuantityToCart(code,1)};
 window.addEletroCart=window.add;
 window.openEletroCart=function(){updateEletroCart();document.getElementById('eletroCart').classList.add('open')};
 window.closeEletroCart=function(){document.getElementById('eletroCart').classList.remove('open')};
@@ -726,6 +733,7 @@ window.changeEletroQty=function(i,d){if(!cart[i])return;cart[i]._qty=(cart[i]._q
 window.removeEletroCartItem=function(i){if(!cart[i])return;cart.splice(i,1);invalidateFreight();updateEletroCart()};
 window.clearEletroCart=function(){cart=[];selectedFreight=null;try{localStorage.removeItem('eletro_cart_v2')}catch(e){}updateEletroCart();document.getElementById('freightResults').innerHTML='';document.getElementById('freightTotal').style.display='none';document.getElementById('freightGrandTotalHint').textContent='';document.getElementById('freightGrandTotalHint').style.display='none';document.getElementById('freightSelectedMethod').textContent='—';document.getElementById('freightSelectedDays').textContent='';document.getElementById('freightTotalValue').textContent='R$ 0,00'};
 cartBtn.onclick=openEletroCart;
+try{updateEletroCart()}catch(e){console.error('Carrinho inicial:',e)}
 document.getElementById('eletroCart').onclick=function(e){if(e.target===this)closeEletroCart()};
 window.printEletroLabel=function(){
  if(!cart.length)return alert('Seu carrinho está vazio.');
@@ -990,11 +998,3 @@ window.confirmPaymentAndSend=async function(){
    diagnostic+='\nEsse diagnóstico é temporário para identificarmos a causa exata.';
    alert(diagnostic);
  }
- finally{if(btn){btn.disabled=false;btn.textContent='✅ Confirmar pedido e ir para o WhatsApp'}}
-};
-window.finishEletroOrder=window.openPaymentCheckout;
-// Login do proprietário: PIN local + conta Supabase. A sessão fica persistida no aparelho do proprietário.
-(function(){
- const ADMIN_PIN='ELETRO2026';let taps=0,timer=null;const logo=document.querySelector('.logo');
- async function activateAdmin(){
-   if(!cloudReady)return alert('⚙️ O painel online ainda não foi configurado.\n\nPrimeiro configure o Supabase conforme o LEIA-ME.');
