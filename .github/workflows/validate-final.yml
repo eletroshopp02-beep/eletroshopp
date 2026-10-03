@@ -1,0 +1,31 @@
+name: Validar Eletroshopp final
+
+on:
+  push:
+    branches: [eletroshopp-final]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validar JavaScript
+        run: node --check app.js
+      - name: Validar catálogo
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path("data/products.json").read_text(encoding="utf-8"))
+          assert len(data)==64
+          assert all(p.get("name") for p in data)
+          print("Catálogo:",len(data),"produtos")
+          print("Sem preço:",[p.get("name") for p in data if not p.get("sale")])
+          PY
+      - name: Validar HTML
+        run: |
+          grep -q 'app.js' index.html
+          grep -q 'manifest.webmanifest' index.html
+          grep -q 'checkoutForm' index.html
+          echo "HTML válido"
