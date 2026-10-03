@@ -74,15 +74,25 @@ jobs:
           git commit -m "Gerar diagnóstico do catálogo legado" || exit 0
           git push --force
 
-      - name: Transfer catalog to new project branch
+      - name: Transfer final store files
         run: |
-          cp products-extracted.json /tmp/products-extracted.json
-          git fetch origin eletroshopp-novo
-          git switch --detach origin/eletroshopp-novo
+          git show origin/eletroshopp-novo:index.html > /tmp/index.html
+          git show origin/eletroshopp-novo:app.js > /tmp/app.js
+          git show origin/eletroshopp-novo:styles.css > /tmp/styles.css
+          git show origin/eletroshopp-novo:manifest.webmanifest > /tmp/manifest.webmanifest
+          git show origin/eletroshopp-novo:sw.js > /tmp/sw.js
+          git show origin/eletroshopp-novo:data/products.json > /tmp/products.json
+          git fetch origin eletroshopp-final
+          git switch --detach origin/eletroshopp-final
           mkdir -p data
-          cp /tmp/products-extracted.json data/products.json
+          cp /tmp/index.html index.html
+          cp /tmp/app.js app.js
+          cp /tmp/styles.css styles.css
+          cp /tmp/manifest.webmanifest manifest.webmanifest
+          cp /tmp/sw.js sw.js
+          cp /tmp/products.json data/products.json
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/products.json
-          git commit -m "Migrar catálogo completo para novo Eletroshopp" || exit 0
-          git push origin HEAD:eletroshopp-novo
+          git add index.html app.js styles.css manifest.webmanifest sw.js data/products.json
+          git commit -m "Publicar nova arquitetura Eletroshopp" || exit 0
+          git push origin HEAD:eletroshopp-final
