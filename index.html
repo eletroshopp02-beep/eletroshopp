@@ -998,4 +998,48 @@ window.confirmPaymentAndSend=async function(){
    diagnostic+='\nEsse diagnóstico é temporário para identificarmos a causa exata.';
    alert(diagnostic);
  }
+}
 })();</script>
+<style id="esh-v3">
+:root{--esh-red:#e30613;--esh-blue:#0b2a4a;--esh-blue2:#123f68}
+body{background:linear-gradient(180deg,#061525,#071a2d 55%,#061321)}
+header{background:rgba(5,20,35,.97);border-bottom-color:var(--esh-red)}
+.logo{color:#fff}.logo span{color:#3da5ff}
+.hero{background:radial-gradient(circle at 82% 18%,rgba(230,6,19,.24),transparent 30%),radial-gradient(circle at 15% 80%,rgba(18,63,104,.42),transparent 35%),linear-gradient(135deg,#061525,#0b2743 55%,#071525)}
+.card,.funnel,.freight-box,.product-detail-modal,.cart-modal{background:#0a1b2d;border-color:#214563}
+.search{background:#0b1d30;border-color:#244d70}
+.cart,.buy,.detail-add,.freight-btn,.install-app-btn,.tag,.filter.active{background:var(--esh-red)!important;color:#fff!important;border-color:var(--esh-red)!important}
+.waHero,.funnel-cta{background:var(--esh-blue2)!important;color:#fff!important;border:1px solid #3da5ff}
+.price,.detail-price,.cat,.detail-benefit b,.funnel-grid b{color:#ff3340!important}
+.cart-float{background:var(--esh-red)!important;color:#fff!important}
+#eshSplash{position:fixed;inset:0;z-index:999999;background:radial-gradient(circle at 50% 35%,#123f68 0,#071a2d 42%,#030a12 100%);display:flex;align-items:center;justify-content:center;transition:opacity .35s,visibility .35s}
+#eshSplash.hide{opacity:0;visibility:hidden;pointer-events:none}
+.esh-splash-inner{text-align:center;padding:30px;animation:eshIn .6s ease}.esh-logo{font-size:clamp(46px,14vw,76px);font-weight:1000;letter-spacing:-3px}.esh-logo span{color:var(--esh-red)}.esh-splash-sub{margin-top:8px;color:#b9d4eb;font-size:13px;letter-spacing:.16em;text-transform:uppercase}.esh-splash-line{width:160px;height:4px;margin:24px auto 0;border-radius:999px;background:linear-gradient(90deg,var(--esh-red),#3da5ff,var(--esh-red));background-size:200% 100%;animation:eshLoad 1s linear infinite}@keyframes eshIn{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}@keyframes eshLoad{to{background-position:200% 0}}
+</style>
+<div id="eshSplash" aria-label="Abrindo Eletroshopp"><div class="esh-splash-inner"><div class="esh-logo">Eletro<span>shopp</span></div><div class="esh-splash-sub">Tecnologia • Acessórios • Ferramentas</div><div class="esh-splash-line"></div></div></div>
+<script>
+(function(){
+"use strict";
+function persist(){try{localStorage.setItem("eletro_cart_v2",JSON.stringify(cart))}catch(_){}}
+function normalize(){try{const p=JSON.parse(localStorage.getItem("eletro_cart_v2")||"[]");if(Array.isArray(p))cart=p.filter(x=>x&&x.code).map(x=>({...x,_qty:Math.max(1,Math.min(99,Number(x._qty)||1))}))}catch(_){cart=[]}}
+window.addQuantityToCart=function(code,qty){
+ const p=(typeof products!=="undefined"?products:[]).find(x=>String(x.code)===String(code));
+ if(!p||p.soldout)return false;
+ const q=Math.max(1,Math.min(99,Number(qty)||1)),item=cart.find(x=>String(x.code)===String(code));
+ if(item)item._qty=Math.min(99,(Number(item._qty)||1)+q);else cart.push({...p,_qty:q});
+ persist();if(typeof updateEletroCart==="function")updateEletroCart();return true;
+};
+window.addDirectToCart=function(code){const ok=window.addQuantityToCart(code,1);if(!ok){alert("Não foi possível adicionar este produto.");return false}if(typeof showEletroToast==="function")showEletroToast("Produto adicionado ao carrinho!");if(typeof openEletroCart==="function")openEletroCart();return true};
+window.addFromDetail=function(code){const q=typeof getDetailQty==="function"?getDetailQty():1;const ok=window.addQuantityToCart(code,q);if(!ok)return false;if(typeof closeProductDetail==="function")closeProductDetail();if(typeof openEletroCart==="function")openEletroCart();if(typeof showEletroToast==="function")showEletroToast(q===1?"Produto adicionado ao carrinho!":q+" unidades adicionadas ao carrinho!");return true};
+window.buyNowFromDetail=function(code){const q=typeof getDetailQty==="function"?getDetailQty():1;const ok=window.addQuantityToCart(code,q);if(!ok)return false;if(typeof closeProductDetail==="function")closeProductDetail();if(typeof openEletroCart==="function")openEletroCart();return true};
+normalize();
+function closeSplash(){const e=document.getElementById("eshSplash");if(!e)return;setTimeout(()=>e.classList.add("hide"),850);setTimeout(()=>e.remove(),1250)}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",closeSplash,{once:true});else closeSplash();
+let deferredPrompt=null;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;const b=document.getElementById("installApp");if(b)b.style.display="inline-flex";const s=document.getElementById("pwaStatus");if(s)s.textContent="Aplicativo pronto para instalar no celular."});
+window.addEventListener("appinstalled",()=>{deferredPrompt=null;const b=document.getElementById("installApp");if(b){b.textContent="✓ Aplicativo instalado";b.disabled=true}});
+document.addEventListener("click",async e=>{const b=e.target.closest&&e.target.closest("#installApp");if(!b)return;if(deferredPrompt){try{await deferredPrompt.prompt();await deferredPrompt.userChoice}catch(_){}deferredPrompt=null}else{const st=document.getElementById("pwaStatus");if(st)st.textContent="Use o menu ⋮ do navegador e escolha “Instalar aplicativo” ou “Adicionar à tela inicial”."}});
+if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js",{updateViaCache:"none"}).then(r=>{try{r.update()}catch(_){} }).catch(e=>console.warn("PWA:",e)));
+})();
+</script>
+</body></html>
