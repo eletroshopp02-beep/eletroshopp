@@ -41,3 +41,5 @@ jobs:
           name: Eletroshopp-APK
           path: android-app/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+# Build APK com SDK moderno
