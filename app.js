@@ -38,7 +38,10 @@ function normalize(p){
     image:String(p.image||""),
     category:categoryOf(p),
     soldout:Boolean(p.soldout||p.esgotado||p.stock===0||!p.sale||String(p.status||"").toLowerCase().includes("esgot")),
-    weight:Number(p.weight)||0.35,\n    width:Number(p.width)||8,\n    height:Number(p.height)||4,\n    length:Number(p.length)||20,
+    weight:Number(p.weight)||0.35,
+    width:Number(p.width)||8,
+    height:Number(p.height)||4,
+    length:Number(p.length)||20,
     raw:p
   };
 }
@@ -157,12 +160,27 @@ async function confirmOrder(e){
   try{
     const {data,error}=await invokeFunction("create-order",order);
     if(error||data?.ok!==true)throw error||new Error(data?.error||"Falha ao registrar pedido");
-    const lines=order.items.map(i=>`${i.qty}x ${i.name} — ${i.sale}`).join("\n");
-    const msg=`Olá! Quero confirmar o pedido ${order.id}.\n\n${lines}\n\nProdutos: ${money(order.totalProducts)}\nFrete: ${money(order.freight.price)} (${order.freight.days} dias úteis)\nTotal: ${money(order.grandTotal)}\n\nCliente: ${buyer.name}\nWhatsApp: ${buyer.phone}\nEndereço: ${buyer.address}, ${buyer.number} — ${buyer.neighborhood} — ${buyer.city}\nCEP: ${buyer.cep}\nPagamento: ${order.payment}`;
+    const lines=order.items.map(i=>`${i.qty}x ${i.name} — ${i.sale}`).join("
+");
+    const msg=`Olá! Quero confirmar o pedido ${order.id}.
+
+${lines}
+
+Produtos: ${money(order.totalProducts)}
+Frete: ${money(order.freight.price)} (${order.freight.days} dias úteis)
+Total: ${money(order.grandTotal)}
+
+Cliente: ${buyer.name}
+WhatsApp: ${buyer.phone}
+Endereço: ${buyer.address}, ${buyer.number} — ${buyer.neighborhood} — ${buyer.city}
+CEP: ${buyer.cep}
+Pagamento: ${order.payment}`;
     localStorage.removeItem("eletroshopp-cart");window.location.href="https://wa.me/"+WA+"?text="+encodeURIComponent(msg);
   }catch(err){
     console.error(err);
-    alert("Não foi possível registrar o pedido. Ele não foi enviado ao WhatsApp.\n\n"+(err.message||"Tente novamente."));
+    alert("Não foi possível registrar o pedido. Ele não foi enviado ao WhatsApp.
+
+"+(err.message||"Tente novamente."));
     btn.disabled=false;btn.textContent="Confirmar pedido e abrir WhatsApp";
   }
 }
