@@ -89,7 +89,7 @@ function cleanCep(v){return String(v||"").replace(/\D/g,"").slice(0,8);}
 function formatCep(v){const c=cleanCep(v);return c.length>5?c.slice(0,5)+"-"+c.slice(5):c;}
 function specs(){
   const weight=Math.max(.35,state.items.reduce((s,i)=>s+(Number(i.weight)||.35)*i.qty,0));
-  return {width:20,height:15,length:8,weight:Number(weight.toFixed(2))};
+  return {width:20,height:15,length:8,weight:Number(weight.toFixed(3))};
 }
 function updateSummary(){
   const productsTotal=state.items.reduce((s,i)=>s+i.price*i.qty,0), freight=state.freight?.price||0;
@@ -113,7 +113,7 @@ async function quoteFreight(){
   const box=$("#freightResults");box.innerHTML='<div class="loading">⏳ Consultando tarifas reais...</div>';
   try{
     const s=specs();
-    const payload={fromPostalCode:"84272402",toPostalCode:cep,products:state.items.map(i=>({id:i.id,width:s.width,height:s.height,length:s.length,weight:s.weight,insurance_value:i.price,quantity:i.qty}))};
+    const payload={fromPostalCode:"84272402",toPostalCode:cep,products:s.products};
     const request=invokeFunction("melhorenvio-quote",payload);
     const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error("TIMEOUT")),15000));
     const {data,error}=await Promise.race([request,timeout]);
