@@ -6,7 +6,11 @@
     "desc": "Smartwatch XV9 PRO com design quadrado, tela de nível AMOLED, CPU Dual Core, armazenamento interno de 2 GB, chamadas Bluetooth, notificações, modos esportivos, monitoramento de sono, controle de câmera e música e personalização do mostrador. O conjunto de recursos pode variar conforme a versão.",
     "image": null,
     "stock": 10,
-    "category": "Smartwatches"
+    "category": "Smartwatches",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 2,
@@ -15,7 +19,11 @@
     "desc": "Smartwatch S11 PRO. Produto disponível na Eletroshopp.",
     "image": null,
     "stock": 10,
-    "category": "Smartwatches"
+    "category": "Smartwatches",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 3,
@@ -24,7 +32,11 @@
     "desc": "Kit de ferramentas para manutenção e pequenos reparos, indicado para uso doméstico, montagem e serviços gerais. Conjunto compacto para ter as ferramentas essenciais sempre à mão. A quantidade e composição das peças podem variar conforme o lote.",
     "image": null,
     "stock": 10,
-    "category": "Ferramentas"
+    "category": "Ferramentas",
+    "width": 7,
+    "height": 3.3,
+    "length": 14,
+    "weight": 0.307
   },
   {
     "code": 4,
@@ -33,7 +45,11 @@
     "desc": "Microwear S10 Série 10: smartwatch de visual premium com tela ampla, chamadas Bluetooth, notificações, recursos esportivos e funções inteligentes. Anúncios atuais do S10 também indicam versões com AMOLED, GPS, NFC, bússola e MicroOS 10; confirme a configuração exata da unidade antes da compra. Compatível com Android e iOS.",
     "image": "https://down-br.img.susercontent.com/file/sg-11134201-7rdvu-mdkzm6ghfrvo9b",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 7.05,
+    "height": 2.05,
+    "length": 24,
+    "weight": 0.18
   },
   {
     "code": 5,
@@ -42,7 +58,11 @@
     "desc": "Microwear S10 Série 10: smartwatch de visual premium com tela ampla, chamadas Bluetooth, notificações, recursos esportivos e funções inteligentes. Anúncios atuais do S10 também indicam versões com AMOLED, GPS, NFC, bússola e MicroOS 10; confirme a configuração exata da unidade antes da compra. Compatível com Android e iOS.",
     "image": "https://down-br.img.susercontent.com/file/sg-11134201-7rdvu-mdkzm6ghfrvo9b",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 7.05,
+    "height": 2.05,
+    "length": 24,
+    "weight": 0.18
   },
   {
     "code": 6,
@@ -51,7 +71,11 @@
     "desc": "Microwear S11 Série 11: smartwatch com tela ampla, chamadas Bluetooth, notificações e recursos para esporte e rotina. Fontes de mercado descrevem versões com WhatsApp, ChatGPT, GPS pareado ao celular, NFC para fechaduras, bússola, tradutor e modos de saúde. Recursos, tamanho e memória variam conforme a versão.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-81z1k-meyaj8t29qfbae",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 2.05,
+    "length": 14,
+    "weight": 0.165
   },
   {
     "code": 7,
@@ -60,7 +84,11 @@
     "desc": "Microwear S11 Série 11: smartwatch com tela ampla, chamadas Bluetooth, notificações e recursos para esporte e rotina. Fontes de mercado descrevem versões com WhatsApp, ChatGPT, GPS pareado ao celular, NFC para fechaduras, bússola, tradutor e modos de saúde. Recursos, tamanho e memória variam conforme a versão.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-81z1k-meyaj8t29qfbae",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 8,
@@ -69,7 +97,11 @@
     "desc": "Microwear S11 Série 11: smartwatch com tela ampla, chamadas Bluetooth, notificações e recursos para esporte e rotina. Fontes de mercado descrevem versões com WhatsApp, ChatGPT, GPS pareado ao celular, NFC para fechaduras, bússola, tradutor e modos de saúde. Recursos, tamanho e memória variam conforme a versão.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-81z1k-meyaj8t29qfbae",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 9,
@@ -78,7 +110,11 @@
     "desc": "Microwear W10: linha Série 10 com versões compactas e Pro/Pro Mini, visual moderno e foco em chamadas Bluetooth, notificações, atividades e personalização. Há versões anunciadas com tela AMOLED, WhatsApp, ChatGPT, GPS e até 1 GB de memória; confirme a configuração do modelo escolhido.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-820lk-mn7ve5uuza4g71",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 7.6,
+    "height": 2.5,
+    "length": 23.7,
+    "weight": 0.21
   },
   {
     "code": 10,
@@ -87,7 +123,11 @@
     "desc": "Microwear W10: linha Série 10 com versões compactas e Pro/Pro Mini, visual moderno e foco em chamadas Bluetooth, notificações, atividades e personalização. Há versões anunciadas com tela AMOLED, WhatsApp, ChatGPT, GPS e até 1 GB de memória; confirme a configuração do modelo escolhido.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-820lk-mn7ve5uuza4g71",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 7.6,
+    "height": 2.5,
+    "length": 23.7,
+    "weight": 0.21
   },
   {
     "code": 11,
@@ -96,7 +136,11 @@
     "desc": "Microwear W10: linha Série 10 com versões compactas e Pro/Pro Mini, visual moderno e foco em chamadas Bluetooth, notificações, atividades e personalização. Há versões anunciadas com tela AMOLED, WhatsApp, ChatGPT, GPS e até 1 GB de memória; confirme a configuração do modelo escolhido.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-820lk-mn7ve5uuza4g71",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 7.6,
+    "height": 2.5,
+    "length": 23.7,
+    "weight": 0.21
   },
   {
     "code": 12,
@@ -105,7 +149,11 @@
     "desc": "Microwear W10: linha Série 10 com versões compactas e Pro/Pro Mini, visual moderno e foco em chamadas Bluetooth, notificações, atividades e personalização. Há versões anunciadas com tela AMOLED, WhatsApp, ChatGPT, GPS e até 1 GB de memória; confirme a configuração do modelo escolhido.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-820lk-mn7ve5uuza4g71",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 7.6,
+    "height": 2.5,
+    "length": 23.7,
+    "weight": 0.21
   },
   {
     "code": 13,
@@ -114,7 +162,11 @@
     "desc": "Microwear W11: linha Série 11 voltada a conectividade, chamadas, notificações, esportes e funções inteligentes. Há versões anunciadas com AMOLED, GPS, WhatsApp, ChatGPT e recursos de IA. As especificações mudam entre W11, Pro, Mini, G e AI; confirme a configuração disponível.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-81z1k-meyaj8t29qfbae",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 14,
@@ -123,7 +175,11 @@
     "desc": "Microwear U4: smartwatch da linha Ultra com design moderno, tela ampla, chamadas e notificações. A versão U4 Pro encontrada em anúncios atuais é divulgada com 49 mm, NFC, GPS, bússola, ChatGPT e resistência 3 ATM; os recursos variam conforme a versão U4, Mini, Pro ou Plus.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-81z1k-midovcmhf2m943",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 15,
@@ -132,7 +188,11 @@
     "desc": "Microwear U4: smartwatch da linha Ultra com design moderno, tela ampla, chamadas e notificações. A versão U4 Pro encontrada em anúncios atuais é divulgada com 49 mm, NFC, GPS, bússola, ChatGPT e resistência 3 ATM; os recursos variam conforme a versão U4, Mini, Pro ou Plus.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-81z1k-midovcmhf2m943",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 16,
@@ -141,7 +201,11 @@
     "desc": "Microwear U4: smartwatch da linha Ultra com design moderno, tela ampla, chamadas e notificações. A versão U4 Pro encontrada em anúncios atuais é divulgada com 49 mm, NFC, GPS, bússola, ChatGPT e resistência 3 ATM; os recursos variam conforme a versão U4, Mini, Pro ou Plus.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-81z1k-midovcmhf2m943",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 17,
@@ -150,7 +214,11 @@
     "desc": "Microwear U4: smartwatch da linha Ultra com design moderno, tela ampla, chamadas e notificações. A versão U4 Pro encontrada em anúncios atuais é divulgada com 49 mm, NFC, GPS, bússola, ChatGPT e resistência 3 ATM; os recursos variam conforme a versão U4, Mini, Pro ou Plus.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-81z1k-midovcmhf2m943",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 18,
@@ -159,7 +227,11 @@
     "desc": "Microwear U4: smartwatch da linha Ultra com design moderno, tela ampla, chamadas e notificações. A versão U4 Pro encontrada em anúncios atuais é divulgada com 49 mm, NFC, GPS, bússola, ChatGPT e resistência 3 ATM; os recursos variam conforme a versão U4, Mini, Pro ou Plus.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-81z1k-midovcmhf2m943",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 19,
@@ -168,7 +240,11 @@
     "desc": "Microwear Ultra: smartwatch de maior porte da linha, com foco em conectividade, tela ampla, chamadas e recursos inteligentes. Algumas versões são anunciadas com 4G, GPS, NFC e funções de IA. Confirme rede, sistema e acessórios da unidade disponível.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 20,
@@ -177,7 +253,11 @@
     "desc": "Microwear W11: linha Série 11 voltada a conectividade, chamadas, notificações, esportes e funções inteligentes. Há versões anunciadas com AMOLED, GPS, WhatsApp, ChatGPT e recursos de IA. As especificações mudam entre W11, Pro, Mini, G e AI; confirme a configuração disponível.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-81z1k-meyaj8t29qfbae",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 21,
@@ -186,7 +266,11 @@
     "desc": "Microwear W11: linha Série 11 voltada a conectividade, chamadas, notificações, esportes e funções inteligentes. Há versões anunciadas com AMOLED, GPS, WhatsApp, ChatGPT e recursos de IA. As especificações mudam entre W11, Pro, Mini, G e AI; confirme a configuração disponível.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-81z1k-meyaj8t29qfbae",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 22,
@@ -195,7 +279,11 @@
     "desc": "Microwear W11: linha Série 11 voltada a conectividade, chamadas, notificações, esportes e funções inteligentes. Há versões anunciadas com AMOLED, GPS, WhatsApp, ChatGPT e recursos de IA. As especificações mudam entre W11, Pro, Mini, G e AI; confirme a configuração disponível.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-81z1k-meyaj8t29qfbae",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 23,
@@ -204,7 +292,11 @@
     "desc": "Microwear W11: linha Série 11 voltada a conectividade, chamadas, notificações, esportes e funções inteligentes. Há versões anunciadas com AMOLED, GPS, WhatsApp, ChatGPT e recursos de IA. As especificações mudam entre W11, Pro, Mini, G e AI; confirme a configuração disponível.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-81z1k-meyaj8t29qfbae",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 24,
@@ -213,7 +305,11 @@
     "desc": "Microwear W11: linha Série 11 voltada a conectividade, chamadas, notificações, esportes e funções inteligentes. Há versões anunciadas com AMOLED, GPS, WhatsApp, ChatGPT e recursos de IA. As especificações mudam entre W11, Pro, Mini, G e AI; confirme a configuração disponível.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-81z1k-meyaj8t29qfbae",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 25,
@@ -222,7 +318,11 @@
     "desc": "Microwear Ultra: smartwatch de maior porte da linha, com foco em conectividade, tela ampla, chamadas e recursos inteligentes. Algumas versões são anunciadas com 4G, GPS, NFC e funções de IA. Confirme rede, sistema e acessórios da unidade disponível.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 26,
@@ -231,7 +331,11 @@
     "desc": "Microwear U5: smartwatch da linha Ultra/Série 11 com foco em tela ampla, chamadas, notificações, esportes e funções inteligentes. Anúncios atuais do U5/U5 Plus mostram versões com AMOLED, GPS, NFC e compatibilidade com Android/iOS. Confirme tamanho e recursos da versão escolhida.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-81z1k-midovcmhf2m943",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 27,
@@ -240,7 +344,11 @@
     "desc": "Microwear U5: smartwatch da linha Ultra/Série 11 com foco em tela ampla, chamadas, notificações, esportes e funções inteligentes. Anúncios atuais do U5/U5 Plus mostram versões com AMOLED, GPS, NFC e compatibilidade com Android/iOS. Confirme tamanho e recursos da versão escolhida.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-81z1k-midovcmhf2m943",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 28,
@@ -249,7 +357,11 @@
     "desc": "Microwear U5: smartwatch da linha Ultra/Série 11 com foco em tela ampla, chamadas, notificações, esportes e funções inteligentes. Anúncios atuais do U5/U5 Plus mostram versões com AMOLED, GPS, NFC e compatibilidade com Android/iOS. Confirme tamanho e recursos da versão escolhida.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-81z1k-midovcmhf2m943",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 29,
@@ -258,7 +370,11 @@
     "desc": "Microwear U5: smartwatch da linha Ultra/Série 11 com foco em tela ampla, chamadas, notificações, esportes e funções inteligentes. Anúncios atuais do U5/U5 Plus mostram versões com AMOLED, GPS, NFC e compatibilidade com Android/iOS. Confirme tamanho e recursos da versão escolhida.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-81z1k-midovcmhf2m943",
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 30,
@@ -267,7 +383,11 @@
     "desc": "Microwear Série MA: smartwatch para uso diário, notificações, conectividade Bluetooth, chamadas e acompanhamento de atividades. Recursos como GPS, NFC, resistência e sensores podem variar conforme o modelo.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 31,
@@ -276,7 +396,11 @@
     "desc": "Microwear Série MA: smartwatch para uso diário, notificações, conectividade Bluetooth, chamadas e acompanhamento de atividades. Recursos como GPS, NFC, resistência e sensores podem variar conforme o modelo.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 32,
@@ -285,7 +409,11 @@
     "desc": "Microwear Série MA: smartwatch para uso diário, notificações, conectividade Bluetooth, chamadas e acompanhamento de atividades. Recursos como GPS, NFC, resistência e sensores podem variar conforme o modelo.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 33,
@@ -294,7 +422,11 @@
     "desc": "Microwear Série MA: smartwatch para uso diário, notificações, conectividade Bluetooth, chamadas e acompanhamento de atividades. Recursos como GPS, NFC, resistência e sensores podem variar conforme o modelo.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 34,
@@ -303,7 +435,11 @@
     "desc": "Microwear M9: smartwatch premium da linha Microwear, encontrado em anúncios com tela AMOLED, GPS, recursos esportivos, chamadas e controle de câmera. A configuração pode variar por lote e versão; confirme as especificações da unidade disponível.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 35,
@@ -312,7 +448,11 @@
     "desc": "Microwear W59 Mini: modelo compacto indicado para pulsos menores, com chamadas Bluetooth, notificações, modos esportivos, monitoramento de sono e controle de câmera/música. Recursos variam conforme a versão.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 18,
+    "weight": 0.15
   },
   {
     "code": 36,
@@ -321,7 +461,11 @@
     "desc": "Microwear W29: smartwatch compacto para rotina e atividades, com versões anunciadas com Bluetooth, GPS, NFC, tela ampla e recursos esportivos. As especificações variam entre W29S e W29 PRO; confirme a configuração antes da compra.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 37,
@@ -330,7 +474,11 @@
     "desc": "Microwear W29: smartwatch compacto para rotina e atividades, com versões anunciadas com Bluetooth, GPS, NFC, tela ampla e recursos esportivos. As especificações variam entre W29S e W29 PRO; confirme a configuração antes da compra.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 38,
@@ -339,7 +487,11 @@
     "desc": "Microwear SU: linha de smartwatches com foco em conectividade, chamadas, esportes e funções inteligentes. Há versões anunciadas com GPS, NFC, AMOLED e recursos de IA. A configuração exata depende do modelo e lote.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 39,
@@ -348,7 +500,11 @@
     "desc": "Microwear SU: linha de smartwatches com foco em conectividade, chamadas, esportes e funções inteligentes. Há versões anunciadas com GPS, NFC, AMOLED e recursos de IA. A configuração exata depende do modelo e lote.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 40,
@@ -357,7 +513,11 @@
     "desc": "Microwear SU: linha de smartwatches com foco em conectividade, chamadas, esportes e funções inteligentes. Há versões anunciadas com GPS, NFC, AMOLED e recursos de IA. A configuração exata depende do modelo e lote.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches Microwear"
+    "category": "Smartwatches Microwear",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 41,
@@ -366,7 +526,11 @@
     "desc": "GSWear GS10: smartwatch compacto com tela touch, Bluetooth, chamadas, notificações e recursos de atividade. A versão Mini é voltada a pulsos menores e há anúncios com Bluetooth 5.3. Confira a configuração da unidade.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches"
+    "category": "Smartwatches",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 42,
@@ -375,7 +539,11 @@
     "desc": "GSWear GS10: smartwatch compacto com tela touch, Bluetooth, chamadas, notificações e recursos de atividade. A versão Mini é voltada a pulsos menores e há anúncios com Bluetooth 5.3. Confira a configuração da unidade.",
     "image": "https://smart-b2b.com.ua/image/cache/catalog/photo/smart-watch/GS10-Mini-42/Smart-GS10-Mini-14-700x700.jpg",
     "stock": 0,
-    "category": "Smartwatches"
+    "category": "Smartwatches",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 43,
@@ -384,7 +552,11 @@
     "desc": "GSWear GS11 Mini: smartwatch compacto para uso diário, notificações, conectividade Bluetooth e acompanhamento de atividades. A configuração pode variar conforme o lote.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches"
+    "category": "Smartwatches",
+    "width": 8,
+    "height": 4,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 44,
@@ -393,7 +565,11 @@
     "desc": "Kit de pulseiras para smartwatch: opção para renovar o visual do relógio e alternar entre estilos e ocasiões. Antes da compra, confirme largura e compatibilidade com o seu modelo.",
     "image": null,
     "stock": 0,
-    "category": "Acessórios"
+    "category": "Acessórios",
+    "width": 10,
+    "height": 4,
+    "length": 20,
+    "weight": 0.2
   },
   {
     "code": 45,
@@ -402,7 +578,11 @@
     "desc": "Kit de pulseiras para smartwatch: opção para renovar o visual do relógio e alternar entre estilos e ocasiões. Antes da compra, confirme largura e compatibilidade com o seu modelo.",
     "image": null,
     "stock": 0,
-    "category": "Acessórios"
+    "category": "Acessórios",
+    "width": 10,
+    "height": 4,
+    "length": 20,
+    "weight": 0.2
   },
   {
     "code": 46,
@@ -411,7 +591,11 @@
     "desc": "Kit de pulseiras para smartwatch: opção para renovar o visual do relógio e alternar entre estilos e ocasiões. Antes da compra, confirme largura e compatibilidade com o seu modelo.",
     "image": null,
     "stock": 0,
-    "category": "Acessórios"
+    "category": "Acessórios",
+    "width": 10,
+    "height": 4,
+    "length": 20,
+    "weight": 0.2
   },
   {
     "code": 47,
@@ -420,7 +604,11 @@
     "desc": "Kit de pulseiras para smartwatch: opção para renovar o visual do relógio e alternar entre estilos e ocasiões. Antes da compra, confirme largura e compatibilidade com o seu modelo.",
     "image": null,
     "stock": 0,
-    "category": "Acessórios"
+    "category": "Acessórios",
+    "width": 10,
+    "height": 4,
+    "length": 20,
+    "weight": 0.2
   },
   {
     "code": 48,
@@ -429,7 +617,11 @@
     "desc": "Kit de pulseiras para smartwatch: opção para renovar o visual do relógio e alternar entre estilos e ocasiões. Antes da compra, confirme largura e compatibilidade com o seu modelo.",
     "image": null,
     "stock": 0,
-    "category": "Acessórios"
+    "category": "Acessórios",
+    "width": 10,
+    "height": 4,
+    "length": 20,
+    "weight": 0.2
   },
   {
     "code": 49,
@@ -438,7 +630,11 @@
     "desc": "Kit de pulseiras para smartwatch: opção para renovar o visual do relógio e alternar entre estilos e ocasiões. Antes da compra, confirme largura e compatibilidade com o seu modelo.",
     "image": null,
     "stock": 0,
-    "category": "Acessórios"
+    "category": "Acessórios",
+    "width": 10,
+    "height": 4,
+    "length": 20,
+    "weight": 0.2
   },
   {
     "code": 50,
@@ -447,7 +643,11 @@
     "desc": "Wearzone Easy: smartwatch de 1,83 polegada com bateria anunciada de até 7 dias e certificação 1 ATM. Conta com chamadas Bluetooth, notificações, assistente de voz, controle de atividade, câmera e música, além de mostradores personalizáveis. Ideal para rotina e exercícios leves.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-820lr-mn0ok38291xd93",
     "stock": 0,
-    "category": "Smartwatches Wearzone"
+    "category": "Smartwatches Wearzone",
+    "width": 10.9,
+    "height": 9,
+    "length": 9,
+    "weight": 0.165
   },
   {
     "code": 51,
@@ -456,7 +656,11 @@
     "desc": "Wearzone Pulse: smartwatch com tela quadrada, chamadas Bluetooth, recursos de saúde e atividade e assistente de voz. Anúncios atuais apresentam versões com Alexa integrada e resistência 3 ATM. Compatível com Android e iOS; confirme os recursos da versão disponível.",
     "image": "https://down-br.img.susercontent.com/file/br-11134207-820lx-mmf3onetacqsfa",
     "stock": 0,
-    "category": "Smartwatches Wearzone"
+    "category": "Smartwatches Wearzone",
+    "width": 10,
+    "height": 5,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 52,
@@ -465,7 +669,11 @@
     "desc": "Wearzone Life: smartwatch voltado a rotina, saúde e atividades, com tela ampla, notificações, chamadas e recursos de acompanhamento. A configuração de sensores e resistência pode variar conforme a versão.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches Wearzone"
+    "category": "Smartwatches Wearzone",
+    "width": 10,
+    "height": 5,
+    "length": 24,
+    "weight": 0.185
   },
   {
     "code": 53,
@@ -474,7 +682,11 @@
     "desc": "Wearzone Brave: smartwatch esportivo da linha Wearzone, com conectividade e recursos para acompanhamento de atividades. Confirme sensores, autonomia e resistência da versão disponível.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches Wearzone"
+    "category": "Smartwatches Wearzone",
+    "width": 10,
+    "height": 5,
+    "length": 24,
+    "weight": 0.287
   },
   {
     "code": 54,
@@ -483,7 +695,11 @@
     "desc": "Wearzone Action: smartwatch com proposta esportiva, conectividade Bluetooth, notificações e funções para acompanhar atividades. As especificações variam conforme a configuração.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches Wearzone"
+    "category": "Smartwatches Wearzone",
+    "width": 10,
+    "height": 8,
+    "length": 10,
+    "weight": 0.192
   },
   {
     "code": 55,
@@ -492,7 +708,11 @@
     "desc": "Wearzone Kron: smartwatch da linha Wearzone com foco em design, conectividade, notificações e funções inteligentes para o dia a dia. Confirme os recursos da versão disponível.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches Wearzone"
+    "category": "Smartwatches Wearzone",
+    "width": 10,
+    "height": 5,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 56,
@@ -501,7 +721,11 @@
     "desc": "Wearzone Flare: smartwatch premium da Wearzone com foco em conectividade, visual e funções inteligentes. Confira tela, sensores, autonomia e compatibilidade da unidade disponível.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches Wearzone"
+    "category": "Smartwatches Wearzone",
+    "width": 10,
+    "height": 5,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 57,
@@ -510,7 +734,11 @@
     "desc": "Wearzone Horizon: smartwatch Android da linha Horizon, com armazenamento e memória indicados na configuração do produto. Voltado a apps e conectividade; confirme rede, sistema e recursos da unidade.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches Wearzone"
+    "category": "Smartwatches Wearzone",
+    "width": 10,
+    "height": 5,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 58,
@@ -519,7 +747,11 @@
     "desc": "Wearzone Horizon: smartwatch Android da linha Horizon, com armazenamento e memória indicados na configuração do produto. Voltado a apps e conectividade; confirme rede, sistema e recursos da unidade.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches Wearzone"
+    "category": "Smartwatches Wearzone",
+    "width": 10,
+    "height": 5,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 59,
@@ -528,7 +760,11 @@
     "desc": "Wearzone Zone Buds 01: fone Bluetooth compacto para música, chamadas e uso diário. A autonomia, codec, microfone e acessórios podem variar conforme a versão.",
     "image": null,
     "stock": 0,
-    "category": "Fones"
+    "category": "Fones",
+    "width": 8,
+    "height": 5,
+    "length": 12,
+    "weight": 0.18
   },
   {
     "code": 60,
@@ -537,7 +773,11 @@
     "desc": "Wearzone: dispositivo vestível da linha WZ para conectividade e uso diário, com recursos inteligentes conforme a versão. Consulte autonomia, compatibilidade e funções específicas.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches Wearzone"
+    "category": "Smartwatches Wearzone",
+    "width": 10,
+    "height": 5,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 61,
@@ -546,7 +786,11 @@
     "desc": "Wearzone: dispositivo vestível da linha WZ para conectividade e uso diário, com recursos inteligentes conforme a versão. Consulte autonomia, compatibilidade e funções específicas.",
     "image": null,
     "stock": 0,
-    "category": "Smartwatches Wearzone"
+    "category": "Smartwatches Wearzone",
+    "width": 10,
+    "height": 5,
+    "length": 24,
+    "weight": 0.3
   },
   {
     "code": 62,
@@ -555,7 +799,11 @@
     "desc": "Óculos inteligente M01 PRO: acessório conectado com recursos que podem incluir áudio, chamadas, câmera e assistente conforme a versão. A configuração exata deve ser confirmada antes da compra.",
     "image": null,
     "stock": 0,
-    "category": "Óculos inteligentes"
+    "category": "Óculos inteligentes",
+    "width": 8,
+    "height": 6,
+    "length": 18,
+    "weight": 0.3
   },
   {
     "code": 63,
@@ -564,7 +812,11 @@
     "desc": "Óculos inteligente W93: modelo conectado com recursos de áudio e funções inteligentes conforme a versão. Confira câmera, microfone, autonomia e compatibilidade da unidade disponível.",
     "image": null,
     "stock": 0,
-    "category": "Óculos inteligentes"
+    "category": "Óculos inteligentes",
+    "width": 8,
+    "height": 6,
+    "length": 18,
+    "weight": 0.3
   },
   {
     "code": 64,
@@ -573,7 +825,11 @@
     "desc": "Óculos inteligente W93: modelo conectado com recursos de áudio e funções inteligentes conforme a versão. Confira câmera, microfone, autonomia e compatibilidade da unidade disponível.",
     "image": null,
     "stock": 0,
-    "category": "Óculos inteligentes"
+    "category": "Óculos inteligentes",
+    "width": 8,
+    "height": 6,
+    "length": 18,
+    "weight": 0.3
   },
   {
     "code": 65,
@@ -582,7 +838,11 @@
     "desc": "Kit de pulseiras para smartwatch: opção para renovar o visual do relógio e alternar entre estilos e ocasiões. Antes da compra, confirme largura e compatibilidade com o seu modelo.",
     "image": null,
     "stock": 0,
-    "category": "Acessórios"
+    "category": "Acessórios",
+    "width": 10,
+    "height": 4,
+    "length": 20,
+    "weight": 0.2
   },
   {
     "code": 66,
@@ -591,6 +851,10 @@
     "desc": "Óculos inteligente W94: modelo para uso conectado e multimídia, com recursos que podem variar conforme a configuração. Confira áudio, chamadas, câmera e autonomia da versão.",
     "image": null,
     "stock": 0,
-    "category": "Óculos inteligentes"
+    "category": "Óculos inteligentes",
+    "width": 8,
+    "height": 6,
+    "length": 18,
+    "weight": 0.3
   }
 ]
