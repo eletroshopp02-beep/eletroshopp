@@ -132,7 +132,7 @@ async function quoteFreight(){
     const s=specs();
     const payload={fromPostalCode:"84272402",toPostalCode:cep,products:s.products};
     const request=invokeFunction("frenet-quote",payload);
-    const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error("TIMEOUT")),15000));
+    const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error("TIMEOUT")),30000));
     const {data,error}=await Promise.race([request,timeout]);
     if(error)throw error;
     const opts=Array.isArray(data?.quotes)?data.quotes:[];
