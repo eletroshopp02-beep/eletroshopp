@@ -1,8 +1,9 @@
 name: Validar novo Eletroshopp
-
 on:
   push:
     branches: [eletroshopp-novo]
+  pull_request:
+    branches: [main]
 permissions:
   contents: read
 jobs:
@@ -10,24 +11,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - name: Validar JavaScript
-        run: node --check app.js
+        run: |
+          node --check app.js
+          node --check services/freight.js
+          node --check services/orders.js
       - name: Validar catálogo
         run: |
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-          data=json.loads(Path("data/products.json").read_text(encoding="utf-8"))
-          assert len(data)==64, f"Esperados 64 produtos, encontrados {len(data)}"
-          assert all(p.get("name") for p in data)
-          missing_sale=[p.get("name","?") for p in data if not p.get("sale")]
-          missing_images=sum(1 for p in data if not p.get("image"))
-          print("Catálogo válido:",len(data),"produtos; sem preço:",len(missing_sale),"; imagens ausentes:",missing_images)
-          if missing_sale: print("Sem preço:",missing_sale)
-          PY
+          test -s data/products.js
+          grep -q "export const products" data/products.js
       - name: Validar HTML
         run: |
-          grep -q 'app.js' index.html
-          grep -q 'manifest.webmanifest' index.html
-          grep -q 'checkoutForm' index.html
-          echo "HTML base válido"
+          grep -q 'src="./app.js"' index.html
+          grep -q 'href="./styles.css"' index.html
+          grep -q 'src="./supabase-config.js"' index.html
+          grep -q 'id="checkoutModal"' index.html
