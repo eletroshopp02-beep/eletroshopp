@@ -430,7 +430,52 @@ footer{border-top:1px solid #222!important;background:#070707!important}footer .
 body.admin-mode .admin-dashboard-bar{display:flex}
 .admin-dashboard-bar strong{color:#e30613}
 .admin-dashboard-bar button{border:1px solid #444;background:#1d1d1f;color:#fff;border-radius:9px;padding:7px 10px;font-weight:800}
-</style><meta name="color-scheme" content="dark"><meta name="application-name" content="Eletroshopp"></head><body><div class="quickbar" aria-label="Informações rápidas">
+</style><meta name="color-scheme" content="dark"><meta name="application-name" content="Eletroshopp"><style id="esh-professional-v4">
+:root{
+ --esh-red:#e10613;
+ --esh-red2:#ff3340;
+ --esh-blue:#0757a6;
+ --esh-blue2:#0b2a4a;
+ --esh-ink:#061525;
+ --esh-panel:#0a1d31;
+ --esh-line:#1d4b72;
+}
+html{background:var(--esh-ink)}
+body{background:linear-gradient(180deg,#04101d 0%,#061a2d 38%,#04101d 100%)}
+header{background:rgba(4,16,29,.96)!important;border-bottom:2px solid var(--esh-red)!important;box-shadow:0 8px 30px rgba(0,0,0,.22)}
+.logo{color:#fff!important;text-shadow:0 2px 18px rgba(225,6,19,.22)}
+.logo span{color:#4aa8ff!important}
+.search{background:#081a2c!important;border-color:#1d4b72!important}
+.cart,.buy,.detail-add,.freight-btn,.install-app-btn,.tag,.filter.active{
+ background:linear-gradient(135deg,var(--esh-red),var(--esh-red2))!important;color:#fff!important;border-color:var(--esh-red)!important;
+ box-shadow:0 8px 22px rgba(225,6,19,.16)
+}
+.hero{background:
+ radial-gradient(circle at 85% 15%,rgba(225,6,19,.22),transparent 28%),
+ radial-gradient(circle at 12% 80%,rgba(7,87,166,.34),transparent 34%),
+ linear-gradient(135deg,#041322,#0a2948 56%,#061525)!important}
+.hero h1 span,.price,.detail-price,.cat,.detail-benefit b,.funnel-grid b{color:#ff4350!important}
+.card,.funnel,.freight-box,.product-detail-modal,.cart-modal{
+ background:linear-gradient(160deg,#0b2238,#071728)!important;border-color:#1d4b72!important;
+ box-shadow:0 14px 38px rgba(0,0,0,.16)
+}
+.card{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.card:hover{transform:translateY(-3px);border-color:#2c75ad!important;box-shadow:0 18px 42px rgba(0,0,0,.28)}
+.buy:hover,.cart:hover,.install-app-btn:hover,.detail-add:hover,.freight-btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.waHero,.funnel-cta{background:linear-gradient(135deg,#0b2a4a,#0757a6)!important;color:#fff!important;border:1px solid #4aa8ff!important;box-shadow:0 8px 24px rgba(7,87,166,.2)}
+.cart-float{background:linear-gradient(135deg,var(--esh-red),var(--esh-red2))!important;color:#fff!important}
+.install-app-btn{display:inline-flex!important;align-items:center;gap:8px;margin-left:8px}
+.esh-cart-price{color:#ff4350!important;font-weight:900}
+#eshSplash{background:
+ radial-gradient(circle at 50% 25%,rgba(7,87,166,.58),transparent 32%),
+ radial-gradient(circle at 50% 78%,rgba(225,6,19,.2),transparent 35%),
+ linear-gradient(145deg,#020812,#061a2d 52%,#030911)!important}
+.esh-logo{font-weight:1000!important;letter-spacing:-3px;text-shadow:0 12px 45px rgba(7,87,166,.3)}
+.esh-logo span{color:var(--esh-red)!important}
+.esh-splash-sub{color:#bcd8f2!important}
+.esh-splash-line{background:linear-gradient(90deg,var(--esh-red),#4aa8ff,var(--esh-red))!important}
+@media(max-width:600px){.install-app-btn{width:100%;margin:10px 0 0;justify-content:center}.hero-actions{display:flex;flex-direction:column}}
+</style></head><body><div class="quickbar" aria-label="Informações rápidas">
   <div class="qb">
     <span>📦 Envio após confirmação</span>
     <span>🚚 Consulte o frete</span>
@@ -1042,4 +1087,4 @@ document.addEventListener("click",async e=>{const b=e.target.closest&&e.target.c
 if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js",{updateViaCache:"none"}).then(r=>{try{r.update()}catch(_){} }).catch(e=>console.warn("PWA:",e)));
 })();
 </script>
-</body></html>
+<script src="cart-fix.js"></script></body></html>
