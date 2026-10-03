@@ -76,6 +76,7 @@ jobs:
 
       - name: Transfer final store files
         run: |
+          git fetch origin eletroshopp-novo
           git show origin/eletroshopp-novo:index.html > /tmp/index.html
           git show origin/eletroshopp-novo:app.js > /tmp/app.js
           git show origin/eletroshopp-novo:styles.css > /tmp/styles.css
