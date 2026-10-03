@@ -88,8 +88,19 @@ function closeCheckout(){$("#checkoutModal").classList.remove("open");$("#checko
 function cleanCep(v){return String(v||"").replace(/\D/g,"").slice(0,8);}
 function formatCep(v){const c=cleanCep(v);return c.length>5?c.slice(0,5)+"-"+c.slice(5):c;}
 function specs(){
-  const weight=Math.max(.35,state.items.reduce((s,i)=>s+(Number(i.weight)||.35)*i.qty,0));
-  return {width:20,height:15,length:8,weight:Number(weight.toFixed(3))};
+  const products=state.items.map(i=>({
+    id:i.id,
+    code:i.code,
+    width:Number(i.width)||8,
+    height:Number(i.height)||4,
+    length:Number(i.length)||20,
+    weight:Number(i.weight)||0.30,
+    value:Number(i.price)||0,
+    quantity:Math.max(1,Number(i.qty)||1),
+    category:"Eletrônicos"
+  }));
+  const weight=products.reduce((s,p)=>s+p.weight*p.quantity,0);
+  return {products,weight:Number(Math.max(.1,weight).toFixed(3))};
 }
 function updateSummary(){
   const productsTotal=state.items.reduce((s,i)=>s+i.price*i.qty,0), freight=state.freight?.price||0;
@@ -114,7 +125,7 @@ async function quoteFreight(){
   try{
     const s=specs();
     const payload={fromPostalCode:"84272402",toPostalCode:cep,products:s.products};
-    const request=invokeFunction("melhorenvio-quote",payload);
+    const request=invokeFunction("frenet-quote",payload);
     const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error("TIMEOUT")),15000));
     const {data,error}=await Promise.race([request,timeout]);
     if(error)throw error;
@@ -124,7 +135,7 @@ async function quoteFreight(){
     box.innerHTML=opts.map((o,i)=>`<button type="button" class="freight-option" data-i="${i}"><span><b>🚚 ${o.company?o.company+" — ":""}${o.name||"Frete"}</b><small>${o.days??"consulte"} dias úteis</small></span><strong>${money(o.price)}</strong></button>`).join("");
     box.querySelectorAll(".freight-option").forEach(b=>b.addEventListener("click",()=>{
       const o=window.__quotes[Number(b.dataset.i)];
-      state.freight={id:String(o.id||o.name||"frete"),name:o.name||"Frete",price:Number(o.price),days:o.days??""};
+      state.freight={id:String(o.id||o.name||"frete"),name:o.name||"Frete",company:o.company||"",price:Number(o.price),days:o.days??"",carrierCode:o.carrierCode||""};
       box.querySelectorAll(".freight-option").forEach(x=>x.classList.remove("selected"));b.classList.add("selected");updateSummary();
     }));
   }catch(e){
