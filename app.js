@@ -1,28 +1,411 @@
-(()=>{const $=s=>document.querySelector(s);
-const CFG={supabase:"https://sybxbyaywznbwipbssso.supabase.co",key:"sb_publishable_3iXGUzzTaypiGou7K7UFEw_OW1qKljR",originCep:"84261000",whatsapp:"5542999999999"};
-const money=v=>new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(Number(v)||0);
-const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const fallback="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600"><rect width="600" height="600" rx="40" fill="#111522"/><path d="M330 90 190 330h105l-25 180 140-245H305z" fill="#ff2442"/></svg>');
-const products=(Array.isArray(window.ELETRO_PRODUCTS)?window.ELETRO_PRODUCTS:[]).map((p,i)=>({...p,id:String(p.id??i),name:p.name||"Produto",price:Number(p.price)||0,category:p.category||"Outros",brand:p.brand||p.marca||"Eletroshopp",image:p.image||fallback,description:p.description||"Produto Eletroshopp."}));
-let cart=JSON.parse(localStorage.getItem("eletroshopp-cart")||"[]").filter(x=>x&&x.id),state={search:"",cat:"",brand:"",sort:"relevance"};
-const save=()=>{localStorage.setItem("eletroshopp-cart",JSON.stringify(cart));renderCartBadge();renderCart()};
-const count=()=>cart.reduce((n,x)=>n+(x.qty||1),0),total=()=>cart.reduce((n,x)=>n+(+x.price||0)*(x.qty||1),0);
-function toast(t){let e=$("#toast");if(!e){e=document.createElement("div");e.id="toast";document.body.append(e)}e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),1800)}
-function add(id){const p=products.find(x=>x.id===String(id));if(!p)return;const x=cart.find(x=>x.id===p.id);x?x.qty++:cart.push({id:p.id,name:p.name,price:p.price,image:p.image,qty:1});save();toast("Produto adicionado ao carrinho")}
-function change(id,d){const x=cart.find(x=>x.id===String(id));if(!x)return;x.qty+=d;if(x.qty<1)cart=cart.filter(y=>y!==x);save()}
-function visible(){let a=products.filter(p=>(!state.cat||p.category===state.cat)&&(!state.brand||p.brand===state.brand)&&(!state.search||[p.name,p.description,p.category,p.brand].join(" ").toLowerCase().includes(state.search.toLowerCase())));return state.sort==="priceAsc"?a.sort((x,y)=>x.price-y.price):state.sort==="priceDesc"?a.sort((x,y)=>y.price-x.price):a}
-function card(p){return '<article class="product-card"><div class="product-img"><img loading="lazy" src="'+p.image+'" alt="'+esc(p.name)+'" onerror="this.src=''+fallback+''"></div><div class="product-info"><span class="eyebrow">'+esc(p.category)+'</span><h3>'+esc(p.name)+'</h3><p>'+esc(p.description)+'</p><strong>'+money(p.price)+'</strong><button class="add" data-add="'+esc(p.id)+'">Adicionar ao carrinho</button></div></article>'}
-function filters(){const cats=[...new Set(products.map(p=>p.category).filter(Boolean))].sort(),brands=[...new Set(products.map(p=>p.brand).filter(Boolean))].sort();$("#cats").innerHTML='<button class="chip '+(!state.cat?"active":"")+'" data-cat="">Todos</button>'+cats.map(x=>'<button class="chip '+(state.cat===x?"active":"")+'" data-cat="'+esc(x)+'">'+esc(x)+'</button>').join("");$("#brands").innerHTML='<button class="chip '+(!state.brand?"active":"")+'" data-brand="">Todas</button>'+brands.map(x=>'<button class="chip '+(state.brand===x?"active":"")+'" data-brand="'+esc(x)+'">'+esc(x)+'</button>').join("")}
-function render(){const a=visible();$("#products").innerHTML=a.length?a.map(card).join(""):'<div class="empty">Nenhum produto encontrado.</div>';$("#count").textContent=a.length+" produtos encontrados"}
-function featured(){let a=products.slice(0,8);$("#featured").innerHTML=a.map(card).join("")}
-function renderCartBadge(){$("#cartCount").textContent=count()}
-function renderCart(){const b=$("#cartItems");if(!cart.length)b.innerHTML='<div class="empty">Seu carrinho está vazio.</div>';else b.innerHTML=cart.map(x=>'<div class="cart-row"><img src="'+(x.image||fallback)+'"><div><b>'+esc(x.name)+'</b><small>'+money(x.price)+'</small><div class="qty"><button data-minus="'+esc(x.id)+'">−</button><span>'+x.qty+'</span><button data-plus="'+esc(x.id)+'">+</button><button class="remove" data-remove="'+esc(x.id)+'">Excluir</button></div></div></div>').join("");$("#cartTotal").textContent=money(total())}
-function open(id){$(id).classList.add("open");document.body.classList.add("locked")}
-function close(id){$(id).classList.remove("open");if(!document.querySelector(".drawer.open"))document.body.classList.remove("locked")}
-function checkout(){if(!cart.length)return toast("Adicione produtos primeiro");$("#orderSummary").innerHTML=cart.map(x=>'<div>'+x.qty+'× '+esc(x.name)+' <b>'+money(x.price*x.qty)+'</b></div>').join("");$("#orderSubtotal").textContent=money(total());close("#cart");open("#checkout")}
-async function freight(){const cep=$("#cep").value.replace(/\D/g,"");if(cep.length!==8)return toast("Digite um CEP válido");$("#freight").innerHTML='<span class="loading">Calculando frete…</span>';try{const r=await fetch(CFG.supabase+"/functions/v1/frenet-quote",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+CFG.key},body:JSON.stringify({fromPostalCode:CFG.originCep,toPostalCode:cep,items:cart.map(x=>({sku:x.id,quantity:x.qty,price:x.price,weight:1,width:15,height:10,length:20}))})});const j=await r.json();if(!r.ok||!j.quotes?.length)throw Error(j.error||"Frete indisponível");$("#freight").innerHTML=j.quotes.slice(0,4).map((q,i)=>'<label class="freight-option"><input type="radio" name="shipping" value="'+esc(JSON.stringify(q))+'" '+(!i?"checked":"")+'><span><b>'+esc(q.name||q.company||"Entrega")+'</b><small>'+esc(q.days||"")+" dias</small></span><strong>'+money(q.price)+'</strong></label>').join("")}catch(e){$("#freight").innerHTML='<div class="freight-error">'+esc(e.message)+'</div>'}}
-async function finish(){const name=$("#buyerName").value.trim(),phone=$("#buyerPhone").value.trim(),cep=$("#cep").value.replace(/\D/g,""),addr=$("#buyerAddress").value.trim(),selected=document.querySelector('input[name="shipping"]:checked');if(!name||!phone||cep.length!==8||!addr||!selected)return toast("Preencha os dados e calcule o frete");const ship=JSON.parse(selected.value),order={id:"ESH-"+Date.now(),customer:{name,phone,cep,address:addr},items:cart.map(x=>({id:x.id,name:x.name,price:x.price,quantity:x.qty})),subtotal:total(),freight:ship,total:total()+Number(ship.price||0),created_at:new Date().toISOString()};$("#finish").disabled=true;try{const r=await fetch(CFG.supabase+"/functions/v1/create-order",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+CFG.key},body:JSON.stringify(order)});if(!r.ok){const j=await r.json().catch(()=>({}));throw Error(j.error||"Erro ao registrar pedido")}const text="Olá! Quero fazer este pedido na Eletroshopp.\nPedido: "+order.id+"\nCliente: "+name+"\nTotal: "+money(order.total)+"\n\n"+order.items.map(x=>x.quantity+"x "+x.name+" - "+money(x.price*x.quantity)).join("\n");cart=[];save();location.href="https://wa.me/"+CFG.whatsapp+"?text="+encodeURIComponent(text)}catch(e){toast(e.message);$("#finish").disabled=false}}
-document.addEventListener("click",e=>{const t=e.target.closest("[data-add],[data-cat],[data-brand],[data-minus],[data-plus],[data-remove],[data-open-cart],[data-close-cart],[data-checkout],[data-close-checkout],[data-freight],[data-finish]");if(!t)return;if(t.dataset.add)add(t.dataset.add);else if(t.dataset.cat!==undefined){state.cat=t.dataset.cat;filters();render()}else if(t.dataset.brand!==undefined){state.brand=t.dataset.brand;filters();render()}else if(t.dataset.minus)change(t.dataset.minus,-1);else if(t.dataset.plus)change(t.dataset.plus,1);else if(t.dataset.remove){cart=cart.filter(x=>x.id!==t.dataset.remove);save()}else if(t.dataset.openCart)open("#cart");else if(t.dataset.closeCart)close("#cart");else if(t.dataset.checkout)checkout();else if(t.dataset.closeCheckout)close("#checkout");else if(t.dataset.freight)freight();else if(t.dataset.finish)finish()});
-$("#search").addEventListener("input",e=>{state.search=e.target.value;render()});$("#sort").addEventListener("change",e=>{state.sort=e.target.value;render()});
-filters();featured();render();renderCart();renderCartBadge();
+(() => {
+  "use strict";
+
+  const SUPABASE_URL = "https://sybxbyaywznbwipbssso.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_3iXGUzzTaypiGou7K7UFEw_OW1qKljR";
+  const ORIGIN_CEP = "84261000";
+  const WHATSAPP = "5542999999999";
+
+  const $ = (selector) => document.querySelector(selector);
+  const money = (value) => new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  }).format(Number(value) || 0);
+
+  const escapeHtml = (value) => String(value == null ? "" : value).replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[char]));
+
+  const fallbackImage = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600"><rect width="600" height="600" rx="40" fill="#111522"/><path d="M330 90 190 330h105l-25 180 140-245H305z" fill="#ff2442"/></svg>'
+  );
+
+  const products = (Array.isArray(window.ELETRO_PRODUCTS) ? window.ELETRO_PRODUCTS : []).map((item, index) => ({
+    id: String(item.id == null ? index : item.id),
+    name: item.name || "Produto",
+    description: item.description || "Produto Eletroshopp.",
+    price: Number(item.price) || 0,
+    category: item.category || "Outros",
+    brand: item.brand || item.marca || item.category || "Eletroshopp",
+    image: item.image || fallbackImage
+  }));
+
+  let cart = [];
+  try {
+    cart = JSON.parse(localStorage.getItem("eletroshopp-cart") || "[]");
+  } catch (_) {
+    cart = [];
+  }
+
+  let state = { search: "", category: "", brand: "", sort: "relevance" };
+
+  function saveCart() {
+    localStorage.setItem("eletroshopp-cart", JSON.stringify(cart));
+    renderCartBadge();
+    renderCart();
+  }
+
+  function cartCount() {
+    return cart.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
+  }
+
+  function cartTotal() {
+    return cart.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.qty) || 1), 0);
+  }
+
+  function showToast(message) {
+    let toast = $("#toast");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.id = "toast";
+      document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.classList.add("show");
+    window.setTimeout(() => toast.classList.remove("show"), 1800);
+  }
+
+  function addToCart(id) {
+    const product = products.find((item) => item.id === String(id));
+    if (!product) {
+      showToast("Produto não encontrado");
+      return;
+    }
+
+    const existing = cart.find((item) => item.id === product.id);
+    if (existing) {
+      existing.qty = (Number(existing.qty) || 1) + 1;
+    } else {
+      cart.push({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        qty: 1
+      });
+    }
+
+    saveCart();
+    openDrawer("#cart");
+    showToast("Produto adicionado ao carrinho");
+  }
+
+  function changeQuantity(id, delta) {
+    const item = cart.find((entry) => entry.id === String(id));
+    if (!item) return;
+
+    item.qty = (Number(item.qty) || 1) + delta;
+    if (item.qty <= 0) {
+      cart = cart.filter((entry) => entry !== item);
+    }
+    saveCart();
+  }
+
+  function filteredProducts() {
+    const query = state.search.trim().toLowerCase();
+
+    const result = products.filter((product) => {
+      const matchesCategory = !state.category || product.category === state.category;
+      const matchesBrand = !state.brand || product.brand === state.brand;
+      const haystack = [
+        product.name,
+        product.description,
+        product.category,
+        product.brand
+      ].join(" ").toLowerCase();
+      const matchesSearch = !query || haystack.includes(query);
+      return matchesCategory && matchesBrand && matchesSearch;
+    });
+
+    if (state.sort === "priceAsc") result.sort((a, b) => a.price - b.price);
+    if (state.sort === "priceDesc") result.sort((a, b) => b.price - a.price);
+
+    return result;
+  }
+
+  function productCard(product) {
+    return [
+      '<article class="product-card">',
+      '<div class="product-img">',
+      '<img loading="lazy" src="', product.image, '" alt="', escapeHtml(product.name), '" onerror="this.src=\'', fallbackImage, '\'">',
+      '</div>',
+      '<div class="product-info">',
+      '<span class="eyebrow">', escapeHtml(product.category), "</span>",
+      "<h3>", escapeHtml(product.name), "</h3>",
+      "<p>", escapeHtml(product.description), "</p>",
+      "<strong>", money(product.price), "</strong>",
+      '<button class="add" type="button" data-add="', escapeHtml(product.id), '">Adicionar ao carrinho</button>',
+      "</div>",
+      "</article>"
+    ].join("");
+  }
+
+  function renderProducts() {
+    const list = filteredProducts();
+    $("#products").innerHTML = list.length
+      ? list.map(productCard).join("")
+      : '<div class="empty">Nenhum produto encontrado.</div>';
+    $("#count").textContent = list.length + " produtos encontrados";
+  }
+
+  function renderFeatured() {
+    $("#featured").innerHTML = products.slice(0, 8).map(productCard).join("");
+  }
+
+  function renderFilters() {
+    const categories = [...new Set(products.map((item) => item.category).filter(Boolean))].sort();
+    const brands = [...new Set(products.map((item) => item.brand).filter(Boolean))].sort();
+
+    $("#cats").innerHTML =
+      '<button type="button" class="chip ' + (!state.category ? "active" : "") + '" data-category="">Todos</button>' +
+      categories.map((item) =>
+        '<button type="button" class="chip ' + (state.category === item ? "active" : "") +
+        '" data-category="' + escapeHtml(item) + '">' + escapeHtml(item) + "</button>"
+      ).join("");
+
+    $("#brands").innerHTML =
+      '<button type="button" class="chip ' + (!state.brand ? "active" : "") + '" data-brand="">Todas</button>' +
+      brands.map((item) =>
+        '<button type="button" class="chip ' + (state.brand === item ? "active" : "") +
+        '" data-brand="' + escapeHtml(item) + '">' + escapeHtml(item) + "</button>"
+      ).join("");
+  }
+
+  function renderCartBadge() {
+    $("#cartCount").textContent = String(cartCount());
+  }
+
+  function renderCart() {
+    const container = $("#cartItems");
+
+    if (!cart.length) {
+      container.innerHTML = '<div class="empty">Seu carrinho está vazio.</div>';
+    } else {
+      container.innerHTML = cart.map((item) => [
+        '<div class="cart-row">',
+        '<img src="', item.image || fallbackImage, '" alt="">',
+        "<div>",
+        "<b>", escapeHtml(item.name), "</b>",
+        "<small>", money(item.price), "</small>",
+        '<div class="qty">',
+        '<button type="button" data-minus="', escapeHtml(item.id), '">−</button>',
+        "<span>", String(item.qty), "</span>",
+        '<button type="button" data-plus="', escapeHtml(item.id), '">+</button>',
+        '<button type="button" class="remove" data-remove="', escapeHtml(item.id), '">Excluir</button>',
+        "</div></div></div>"
+      ].join("")).join("");
+    }
+
+    $("#cartTotal").textContent = money(cartTotal());
+  }
+
+  function openDrawer(id) {
+    $(id).classList.add("open");
+    document.body.classList.add("locked");
+  }
+
+  function closeDrawer(id) {
+    $(id).classList.remove("open");
+    if (!document.querySelector(".drawer.open")) {
+      document.body.classList.remove("locked");
+    }
+  }
+
+  function openCheckout() {
+    if (!cart.length) {
+      showToast("Adicione produtos primeiro");
+      return;
+    }
+
+    $("#orderSummary").innerHTML = cart.map((item) =>
+      "<div>" + item.qty + "× " + escapeHtml(item.name) +
+      " <b>" + money(item.price * item.qty) + "</b></div>"
+    ).join("");
+
+    $("#orderSubtotal").textContent = money(cartTotal());
+    closeDrawer("#cart");
+    openDrawer("#checkout");
+  }
+
+  async function calculateFreight() {
+    const cep = ($("#cep").value || "").replace(/\D/g, "");
+
+    if (cep.length !== 8) {
+      showToast("Digite um CEP válido");
+      return;
+    }
+
+    $("#freight").innerHTML = '<span class="loading">Calculando frete…</span>';
+
+    try {
+      const response = await fetch(
+        SUPABASE_URL + "/functions/v1/frenet-quote",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + SUPABASE_KEY
+          },
+          body: JSON.stringify({
+            fromPostalCode: ORIGIN_CEP,
+            toPostalCode: cep,
+            items: cart.map((item) => ({
+              sku: item.id,
+              quantity: item.qty,
+              price: item.price,
+              weight: 1,
+              width: 15,
+              height: 10,
+              length: 20
+            }))
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !Array.isArray(data.quotes) || !data.quotes.length) {
+        throw new Error(data.error || "Frete indisponível");
+      }
+
+      $("#freight").innerHTML = data.quotes.slice(0, 4).map((quote, index) => [
+        '<label class="freight-option">',
+        '<input type="radio" name="shipping" value="', escapeHtml(JSON.stringify(quote)), '" ', index === 0 ? "checked" : "", ">",
+        "<span><b>", escapeHtml(quote.name || quote.company || "Entrega"), "</b>",
+        "<small>", escapeHtml(quote.days || ""), " dias</small></span>",
+        "<strong>", money(quote.price), "</strong>",
+        "</label>"
+      ].join("")).join("");
+    } catch (error) {
+      $("#freight").innerHTML = '<div class="freight-error">' + escapeHtml(error.message) + "</div>";
+    }
+  }
+
+  async function finishOrder() {
+    const name = $("#buyerName").value.trim();
+    const phone = $("#buyerPhone").value.trim();
+    const cep = ($("#cep").value || "").replace(/\D/g, "");
+    const address = $("#buyerAddress").value.trim();
+    const shippingInput = document.querySelector('input[name="shipping"]:checked');
+
+    if (!name || !phone || cep.length !== 8 || !address || !shippingInput) {
+      showToast("Preencha os dados e calcule o frete");
+      return;
+    }
+
+    const shipping = JSON.parse(shippingInput.value);
+    const order = {
+      id: "ESH-" + Date.now(),
+      customer: { name, phone, cep, address },
+      items: cart.map((item) => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: item.qty
+      })),
+      subtotal: cartTotal(),
+      freight: shipping,
+      total: cartTotal() + Number(shipping.price || 0),
+      created_at: new Date().toISOString()
+    };
+
+    const button = $("#finish");
+    button.disabled = true;
+    button.textContent = "Enviando pedido…";
+
+    try {
+      const response = await fetch(
+        SUPABASE_URL + "/functions/v1/create-order",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + SUPABASE_KEY
+          },
+          body: JSON.stringify(order)
+        }
+      );
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.error || "Não foi possível registrar o pedido");
+      }
+
+      const lines = order.items.map((item) =>
+        item.quantity + "x " + item.name + " - " + money(item.price * item.quantity)
+      );
+
+      const message = [
+        "Olá! Quero fazer este pedido na Eletroshopp.",
+        "Pedido: " + order.id,
+        "Cliente: " + name,
+        "Total: " + money(order.total),
+        "",
+        lines.join("\n")
+      ].join("\n");
+
+      cart = [];
+      saveCart();
+      window.location.href = "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(message);
+    } catch (error) {
+      showToast(error.message);
+      button.disabled = false;
+      button.textContent = "Finalizar pedido";
+    }
+  }
+
+  document.addEventListener("click", (event) => {
+    const target = event.target.closest("button");
+    if (!target) return;
+
+    if (target.dataset.add) addToCart(target.dataset.add);
+    else if (target.dataset.category !== undefined) {
+      state.category = target.dataset.category;
+      renderFilters();
+      renderProducts();
+    }
+    else if (target.dataset.brand !== undefined) {
+      state.brand = target.dataset.brand;
+      renderFilters();
+      renderProducts();
+    }
+    else if (target.dataset.minus) changeQuantity(target.dataset.minus, -1);
+    else if (target.dataset.plus) changeQuantity(target.dataset.plus, 1);
+    else if (target.dataset.remove) {
+      cart = cart.filter((item) => item.id !== target.dataset.remove);
+      saveCart();
+    }
+    else if (target.dataset.openCart !== undefined) openDrawer("#cart");
+    else if (target.dataset.closeCart !== undefined) closeDrawer("#cart");
+    else if (target.dataset.checkout !== undefined) openCheckout();
+    else if (target.dataset.closeCheckout !== undefined) closeDrawer("#checkout");
+    else if (target.dataset.freight !== undefined) calculateFreight();
+    else if (target.dataset.finish !== undefined) finishOrder();
+  });
+
+  $("#search").addEventListener("input", (event) => {
+    state.search = event.target.value;
+    renderProducts();
+  });
+
+  $("#sort").addEventListener("change", (event) => {
+    state.sort = event.target.value;
+    renderProducts();
+  });
+
+  if (!products.length) {
+    $("#products").innerHTML = '<div class="empty">Catálogo temporariamente indisponível.</div>';
+  } else {
+    renderFilters();
+    renderFeatured();
+    renderProducts();
+  }
+
+  renderCart();
+  renderCartBadge();
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+  }
 })();
