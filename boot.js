@@ -1,4 +1,4 @@
-import { products } from "./data/store-products.js";
+import { products } from "./data/store-products.js?v=20261004-images2";
 
 window.ELETRO_PRODUCTS = products;
 
