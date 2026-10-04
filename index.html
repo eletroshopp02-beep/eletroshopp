@@ -1,14 +1,59 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#090b0e"><meta name="description" content="Eletroshopp — tecnologia, ferramentas e acessórios."><link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./styles.css"><title>Eletroshopp</title></head>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080a10"><meta name="description" content="Eletroshopp — tecnologia, smartwatches, fones e acessórios.">
+<link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="stylesheet" href="./styles.css">
+<title>Eletroshopp — Tecnologia que combina com você</title>
+</head>
 <body>
-<header class="topbar"><a class="brand" href="./" aria-label="Eletroshopp"><span class="brand-mark">⚡</span><span class="brand-name">Eletro<span>shopp</span></span></a><button id="cartButton" class="cart-btn" aria-label="Abrir carrinho"><span class="cart-icon">🛒</span><span id="cartCount">0</span></button></header>
+<header class="topbar">
+  <a class="brand" href="./" aria-label="Eletroshopp"><span class="brand-mark">⚡</span><span class="brand-name">Eletro<span>shopp</span></span></a>
+  <button id="cartButton" class="cart-btn" aria-label="Abrir carrinho"><span class="cart-icon">🛒</span><span id="cartCount">0</span></button>
+</header>
+
 <main>
-<section class="hero"><div class="hero-card"><div class="hero-copy"><span class="eyebrow">ELETROSHOPP • TECNOLOGIA</span><h1>Seu próximo gadget começa aqui.</h1><p>Smartwatches, fones e óculos inteligentes com catálogo atualizado, frete calculado em tempo real e pedido direto pelo WhatsApp.</p><div class="hero-badges"><span>⚡ Compra rápida</span><span>🚚 Frete em tempo real</span><span>💬 WhatsApp</span></div></div><div class="hero-glow">⚡</div></div></section>
-<section class="toolbar"><div class="section-title"><strong>Encontre seu produto</strong><span>Use a busca, categoria ou marca</span></div><div class="search-wrap"><span>⌕</span><input id="search" type="search" placeholder="Buscar produto..." autocomplete="off"></div><div class="filter-title">Categorias</div><div id="categoryChips" class="category-chips"></div><div class="filter-title">Marcas</div><div id="brandChips" class="category-chips"></div><div class="filter-title">Ordenar por</div><div id="sortChips" class="category-chips"></div></section>
-<div id="status" class="status"></div><section id="products" class="grid"></section>
+  <div class="announcement"><span>⚡ OFERTAS ELETROSHOPP</span><span>🚚 Frete calculado em tempo real</span><span>💬 Pedido rápido pelo WhatsApp</span></div>
+
+  <section class="hero">
+    <div class="hero-card">
+      <div class="hero-copy">
+        <span class="eyebrow">ELETROSHOPP • TECNOLOGIA SEM COMPLICAÇÃO</span>
+        <h1>Seu próximo <em>gadget</em> está aqui.</h1>
+        <p>Escolha seu smartwatch, fone ou acessório, coloque no carrinho e receba as opções de frete antes de finalizar.</p>
+        <div class="hero-actions"><a class="hero-cta" href="#products">🔥 Ver ofertas</a><button class="hero-link" type="button" id="heroCart">🛒 Abrir carrinho</button></div>
+        <div class="hero-badges"><span>⚡ Compra rápida</span><span>🚚 Frete em tempo real</span><span>🔒 Pedido registrado</span></div>
+      </div>
+      <div class="hero-device"><div class="device-glow">⌚</div><b>TECNOLOGIA<br><span>NO SEU RITMO</span></b><small>Novidades selecionadas para você</small></div>
+    </div>
+  </section>
+
+  <section class="quick-section">
+    <div class="section-heading"><div><span class="kicker">ESCOLHA SEU ESTILO</span><h2>Encontre o que combina com você</h2></div><span class="scroll-hint">Deslize →</span></div>
+    <div id="quickCats" class="quick-rail"></div>
+  </section>
+
+  <section class="featured-section">
+    <div class="section-heading"><div><span class="kicker">MAIS PROCURADOS</span><h2>Os queridinhos da Eletroshopp 🔥</h2><p>Produtos que chamam atenção pelo visual e pelos recursos.</p></div><span class="scroll-hint">Deslize →</span></div>
+    <div id="featured" class="product-rail"></div>
+  </section>
+
+  <section class="promo-band"><div><span class="promo-icon">⚡</span><div><b>Seu estilo. Sua tecnologia.</b><small>Do básico ao avançado, escolha o produto que faz sentido para você.</small></div></div><span>Confira o catálogo ↓</span></section>
+
+  <section class="toolbar" id="catalog">
+    <div class="section-title"><strong>Catálogo completo</strong><span>Busque por produto, marca ou categoria</span></div>
+    <div class="search-wrap"><span>⌕</span><input id="search" type="search" placeholder="Buscar produto..." autocomplete="off"></div>
+    <div class="filter-title">Categorias</div><div id="categoryChips" class="category-chips"></div>
+    <div class="filter-title">Marcas</div><div id="brandChips" class="category-chips"></div>
+    <div class="filter-title">Ordenar por</div><div id="sortChips" class="category-chips"></div>
+  </section>
+  <div id="status" class="status"></div>
+  <section id="products" class="grid"></section>
 </main>
+
 <div id="backdrop" class="backdrop"></div>
 <aside id="cartPanel" class="cart-panel"><div class="panel-head"><h2>🛒 Seu carrinho</h2><button id="closeCart">×</button></div><div id="cartItems"></div><div class="cart-total"><span>Produtos</span><strong id="cartTotal">R$ 0,00</strong></div><button id="checkout" class="primary">Finalizar pedido</button></aside>
+
 <section id="checkoutModal" class="modal"><div class="modal-card"><div class="panel-head"><h2>📦 Finalizar pedido</h2><button id="closeCheckout">×</button></div><form id="checkoutForm">
 <label>Nome completo<input id="buyerName" required autocomplete="name"></label><label>WhatsApp<input id="buyerPhone" required inputmode="tel" placeholder="(42) 99999-9999"></label>
 <div class="two"><label>CEP<input id="buyerCep" required inputmode="numeric" maxlength="9" placeholder="00000-000"></label><label>Número<input id="buyerNumber" required inputmode="numeric"></label></div>
@@ -18,4 +63,5 @@
 <label>Forma de pagamento<select id="payment"><option>Pagamento na confirmação</option><option>Pix</option><option>Cartão</option></select></label>
 <div id="checkoutSummary" class="summary"></div><button class="primary" type="submit">Confirmar pedido e abrir WhatsApp</button>
 </form></div></section>
-<script src="./data/products.js?v=20261004-catalog"></script><script src="./app.js?v=20261004-clean8"></script></body></html>
+<script src="./app.js?v=20261004-ui10"></script>
+</body></html>
