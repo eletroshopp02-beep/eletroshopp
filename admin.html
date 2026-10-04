@@ -1,1 +1,30 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#07090e"><title>Eletroshopp Admin</title><link rel="stylesheet" href="admin.css?v=20261004-rebuild15"></head><body><header class="topbar"><div><strong>ELETROSHOPP</strong><span>Aplicativo administrativo</span></div><a href="./">← Loja</a></header><main><section id="login" class="panel login"><h1>Acesso administrativo</h1><p>Digite o PIN de administrador para consultar e gerenciar os pedidos.</p><input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" placeholder="PIN administrativo"><button id="enter" class="primary" type="button">Entrar</button><div id="loginMsg" class="msg"></div></section><section id="app" hidden><div class="toolbar"><div><h1>Pedidos</h1><p id="summary">Carregando...</p></div><div class="actions"><button id="refresh" type="button">↻ Atualizar</button><button id="logout" type="button">Sair</button></div></div><div id="orders" class="orders"></div></section></main><script>document.getElementById("enter").addEventListener("click",async()=>{const p=document.getElementById("pin").value.replace(/\D/g,"");const m=document.getElementById("loginMsg");if(p!=="250808"){m.textContent="PIN inválido.";return}m.textContent="Abrindo painel...";try{const r=await fetch("https://sybxbyaywznbwipbssso.supabase.co/functions/v1/admin-orders?t="+Date.now(),{cache:"no-store",headers:{"x-admin-pin":p}});if(!r.ok)throw new Error("Servidor respondeu "+r.status);const d=await r.json();sessionStorage.setItem("esh-admin-pin",p);document.getElementById("login").hidden=true;document.getElementById("app").hidden=false;document.getElementById("summary").textContent=(Array.isArray(d)?d.length:0)+" pedido(s)";window.__ESH_ADMIN_ORDERS=Array.isArray(d)?d:[];document.getElementById("orders").innerHTML=window.__ESH_ADMIN_ORDERS.length?window.__ESH_ADMIN_ORDERS.map(o=>"<article class=\"order\"><b>"+String(o.id||"")+"</b><p>"+String((o.buyer||{}).name||"")+"</p><p>"+String((o.buyer||{}).address||"")+"</p><strong>Total: R$ "+Number(o.grand_total||0).toFixed(2).replace(".",",")+"</strong></article>").join(""):"<div class=\"panel empty\">Nenhum pedido encontrado.</div>"}catch(e){m.textContent="Painel indisponível: "+e.message}});document.getElementById("pin").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("enter").click()});</script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07090e">
+<meta name="description" content="Eletroshopp — aplicativo administrativo">
+<link rel="manifest" href="admin-manifest.json?v=20261004">
+<link rel="stylesheet" href="admin.css?v=20261004-admin-fix">
+<title>Eletroshopp Admin</title>
+</head>
+<body>
+<header class="topbar"><div><strong>ELETROSHOPP</strong><span>Aplicativo administrativo</span></div><a href="./">← Loja</a></header>
+<main>
+<section id="login" class="panel login">
+<h1>Acesso administrativo</h1>
+<p>Digite o PIN de administrador para consultar e gerenciar os pedidos.</p>
+<div class="row"><input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" placeholder="PIN administrativo" aria-label="PIN administrativo"><button id="enter" class="primary" type="button">Entrar</button></div>
+<div id="loginMsg" class="msg" role="status" aria-live="polite"></div>
+</section>
+<section id="app" hidden>
+<div class="toolbar"><div><h1>Pedidos</h1><p id="summary">Carregando...</p></div><div class="actions"><button id="refresh" type="button">↻ Atualizar</button><button id="settingsBtn" type="button">⚙ Remetente</button><button id="logout" type="button">Sair</button></div></div>
+<div id="settings" class="panel settings" hidden><h2>Dados do remetente</h2><div class="grid2"><label>Loja<input id="senderName" value="Eletroshopp"></label><label>CEP<input id="senderCep" value="84261-000"></label><label class="wide">Endereço<input id="senderAddress" placeholder="Rua, número, bairro, complemento"></label><label>Cidade/UF<input id="senderCity" placeholder="Cidade - PR"></label></div><button id="saveSettings" class="primary" type="button">Salvar</button></div>
+<div id="orders" class="orders"></div>
+</section>
+</main>
+<div id="toast" class="toast" aria-live="polite"></div>
+<script src="admin.js?v=20261004-admin-fix"></script>
+</body>
+</html>
