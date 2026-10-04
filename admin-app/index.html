@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07090e"><meta name="description" content="Aplicativo administrativo Eletroshopp">
+<link rel="manifest" href="manifest.json"><link rel="stylesheet" href="admin.css?v=20261004-1">
+<title>Eletroshopp Admin</title></head>
+<body>
+<header class="topbar"><div><strong>ELETROSHOPP</strong><span>Administração</span></div><a href="../">Loja</a></header>
+<main>
+<section id="login" class="panel login"><div class="appmark">⚡</div><h1>Painel administrativo</h1><p>Entre com o PIN para gerenciar pedidos.</p><input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" placeholder="PIN administrativo"><button id="enter" class="primary">Entrar</button><div id="loginMsg" class="msg"></div></section>
+<section id="app" hidden>
+<div class="toolbar"><div><h1>Pedidos</h1><p id="summary">Carregando...</p></div><div class="actions"><button id="refresh">↻ Atualizar</button><button id="logout">Sair</button></div></div>
+<div id="orders" class="orders"></div></section>
+</main>
+<script src="admin.js?v=20261004-1"></script><script>if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js');</script>
+</body></html>
