@@ -42,9 +42,10 @@ async function getProducts(){
  let out=base.map(normalize).filter(p=>p.price>0);
  try{
   const t=await fetch("data/products.js?v=20261004-rebuild8",{cache:"no-store"}).then(r=>r.text());
-  const m=t.match(/(?:let|const|var) products=(\[[\s\S]*?\]);/);
-  if(m){
-   const legacy=JSON.parse(m[1]);
+  const start=t.indexOf("products=")+9;
+  const end=t.indexOf(";let active=",start);
+  if(start>8&&end>start){
+   const legacy=JSON.parse(t.slice(start,end));
    const key=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
    const byName=new Map(legacy.map(x=>[key(x.name),x]));
    const aliases={"smartwatch s11 pro":"microwear s11 pro"};
