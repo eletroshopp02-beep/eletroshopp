@@ -37,11 +37,11 @@ function normalize(p,i){return{
 async function getProducts(){
  let base=Array.isArray(window.ELETRO_PRODUCTS)?window.ELETRO_PRODUCTS:[];
  if(!base.length){
-  try{const t=await fetch("data/products.json?v=20261004-rebuild9",{cache:"no-store"}).then(r=>r.json());base=t}catch(e){base=[]}
+  try{const t=await fetch("data/products.json?v=20261004-rebuild10",{cache:"no-store"}).then(r=>r.json());base=t}catch(e){base=[]}
  }
  let out=base.map(normalize).filter(p=>p.price>0);
  try{
-  const t=await fetch("data/products.js?v=20261004-rebuild9",{cache:"no-store"}).then(r=>r.text());
+  const t=await fetch("data/products.js?v=20261004-rebuild10",{cache:"no-store"}).then(r=>r.text());
   const start=t.indexOf("products=")+9;
   const end=t.indexOf(";let active=",start);
   if(start>8&&end>start){
@@ -49,7 +49,7 @@ async function getProducts(){
    const key=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
    const byName=new Map(legacy.map(x=>[key(x.name),x]));
    const aliases={"smartwatch s11 pro":"microwear s11 pro"};
-   out=out.map(p=>{const k=key(p.name),x=byName.get(k)||byName.get(aliases[k]||"");return x&&x.image?{...p,image:x.image}:p});
+   out=out.map(p=>{const k=key(p.name),x=byName.get(k)||byName.get(aliases[k]||"");return (!p.image&&x&&x.image)?{...p,image:x.image}:p});
   }
  }catch(e){}
  return out;
@@ -133,6 +133,6 @@ const phoneEl=$("#buyerPhone"),cepEl=$("#cep");
 phoneEl?.addEventListener("input",e=>{let v=e.target.value.replace(/\D/g,"").slice(0,11);e.target.value=v.length<=10?v.replace(/(\d{2})(\d{4})(\d{0,4})/,"($1) $2-$3").replace(/-$/,""):v.replace(/(\d{2})(\d{5})(\d{0,4})/,"($1) $2-$3").replace(/-$/,"")});
 cepEl?.addEventListener("input",e=>{let v=e.target.value.replace(/\D/g,"").slice(0,8);e.target.value=v.length>5?v.slice(0,5)+"-"+v.slice(5):v});
 (async()=>{try{products=await getProducts();if(!products.length)throw Error("Catálogo vazio");render();$("#status").textContent=products.length+" produtos disponíveis";}catch(e){console.error(e);$("#status").textContent="Catálogo indisponível";$("#products").innerHTML='<div class="empty">Não foi possível carregar o catálogo.</div>'}})();
-if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=20261004-rebuild9").catch(()=>{}));
+if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=20261004-rebuild10").catch(()=>{}));
 window.Eletroshopp={addToCart:add};
 })();
