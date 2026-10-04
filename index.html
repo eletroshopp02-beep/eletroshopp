@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#090b0e"><meta name="description" content="Eletroshopp — tecnologia, ferramentas e acessórios."><link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./styles.css"><title>Eletroshopp</title></head>
 <body>
-<header class="topbar"><a class="brand" href="./">Eletro<span>shopp</span></a><button id="cartButton" class="cart-btn">🛒 <span id="cartCount">0</span></button></header>
+<header class="topbar"><a class="brand" href="./" aria-label="Eletroshopp"><span class="brand-mark">⚡</span><span class="brand-name">Eletro<span>shopp</span></span></a><button id="cartButton" class="cart-btn" aria-label="Abrir carrinho"><span class="cart-icon">🛒</span><span id="cartCount">0</span></button></header>
 <main>
-<section class="hero"><div><span class="eyebrow">ELETROSHOPP</span><h1>Tecnologia que cabe no seu dia.</h1><p>Smartwatches, fones e óculos inteligentes. Compra simples, frete calculado em tempo real e pedido direto pelo WhatsApp.</p></div></section>
-<section class="toolbar"><div class="search-wrap"><span>⌕</span><input id="search" type="search" placeholder="Buscar produto..." autocomplete="off"></div><div class="filter-title">Categorias</div><div id="categoryChips" class="category-chips"></div><div class="filter-title">Marcas</div><div id="brandChips" class="category-chips"></div><div class="filter-title">Ordenar por</div><div id="sortChips" class="category-chips"></div></section>
+<section class="hero"><div class="hero-card"><div class="hero-copy"><span class="eyebrow">ELETROSHOPP • TECNOLOGIA</span><h1>Seu próximo gadget começa aqui.</h1><p>Smartwatches, fones e óculos inteligentes com catálogo atualizado, frete calculado em tempo real e pedido direto pelo WhatsApp.</p><div class="hero-badges"><span>⚡ Compra rápida</span><span>🚚 Frete em tempo real</span><span>💬 WhatsApp</span></div></div><div class="hero-glow">⚡</div></div></section>
+<section class="toolbar"><div class="section-title"><strong>Encontre seu produto</strong><span>Use a busca, categoria ou marca</span></div><div class="search-wrap"><span>⌕</span><input id="search" type="search" placeholder="Buscar produto..." autocomplete="off"></div><div class="filter-title">Categorias</div><div id="categoryChips" class="category-chips"></div><div class="filter-title">Marcas</div><div id="brandChips" class="category-chips"></div><div class="filter-title">Ordenar por</div><div id="sortChips" class="category-chips"></div></section>
 <div id="status" class="status"></div><section id="products" class="grid"></section>
 </main>
 <div id="backdrop" class="backdrop"></div>
@@ -18,4 +18,4 @@
 <label>Forma de pagamento<select id="payment"><option>Pagamento na confirmação</option><option>Pix</option><option>Cartão</option></select></label>
 <div id="checkoutSummary" class="summary"></div><button class="primary" type="submit">Confirmar pedido e abrir WhatsApp</button>
 </form></div></section>
-<script src="./app.js?v=20261004-clean5"></script></body></html>
+<script src="./app.js?v=20261004-clean7"></script></body></html>
