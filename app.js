@@ -36,9 +36,20 @@ function normalize(p,i){return{
 };}
 async function getProducts(){
  let base=Array.isArray(window.ELETRO_PRODUCTS)?window.ELETRO_PRODUCTS:[];
- if(base.length)return base.map(normalize).filter(p=>p.price>0);
- try{const t=await fetch("data/products.json?v=20261004-rebuild5",{cache:"no-store"}).then(r=>r.json());return t.map(normalize).filter(p=>p.price>0)}
- catch(e){return[]}
+ if(!base.length){
+  try{const t=await fetch("data/products.json?v=20261004-rebuild6",{cache:"no-store"}).then(r=>r.json());base=t}catch(e){base=[]}
+ }
+ let out=base.map(normalize).filter(p=>p.price>0);
+ try{
+  const t=await fetch("data/products.js?v=20261004-rebuild6",{cache:"no-store"}).then(r=>r.text());
+  const m=t.match(/let products=(\[.*?\]);let active/s);
+  if(m){
+   const legacy=JSON.parse(m[1]);
+   const byName=new Map(legacy.map(x=>[(x.name||"").trim().toLowerCase(),x]));
+   out=out.map(p=>{const x=byName.get(p.name.trim().toLowerCase());return x&&x.image?{...p,image:x.image}:p});
+  }
+ }catch(e){}
+ return out;
 }
 let products=[],cart=[],state={search:"",category:"",brand:"",sort:"relevance"};
 try{cart=JSON.parse(localStorage.getItem("eletroshopp-cart-v3")||"[]").filter(x=>x&&x.id)}catch(e){}
@@ -87,12 +98,12 @@ async function finish(){
  const name=$("#buyerName").value.trim(),phone=$("#buyerPhone").value.trim(),cep=$("#cep").value.replace(/\D/g,""),address=$("#buyerAddress").value.trim(),si=document.querySelector('input[name="shipping"]:checked');
  if(!name||!phone||cep.length!==8||!address||!si)return toast("Preencha os dados e selecione o frete");
  const shipping=JSON.parse(decodeURIComponent(si.value));
- const order={id:"ESH-"+Date.now(),customer:{name,phone,cep,address},items:cart.map(x=>({id:x.id,name:x.name,price:x.price,quantity:x.qty})),subtotal:total(),freight:shipping,total:total()+Number(shipping.price||0),created_at:new Date().toISOString()};
+ const order={id:"ESH-"+Date.now(),buyer:{name,phone,cep,address},items:cart.map(x=>({id:x.id,name:x.name,price:x.price,quantity:x.qty})),totalProducts:total(),freight:shipping,grandTotal:total()+Number(shipping.price||0),weight:cart.reduce((n,x)=>{const p=products.find(y=>y.id===String(x.id));return n+(Number(p?.weight||0.3)*(Number(x.qty)||1))},0),createdAt:new Date().toISOString(),payment:"A combinar"};
  const b=$("#finish");b.disabled=true;b.textContent="Enviando…";
  try{
   const r=await fetch(SUPABASE_URL+"/functions/v1/create-order",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+SUPABASE_KEY},body:JSON.stringify(order)});
   const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||"Não foi possível registrar o pedido");
-  const msg=["Olá! Quero fazer este pedido na Eletroshopp.",order.id,"Cliente: "+name,"Telefone: "+phone,"CEP: "+cep,"Endereço: "+address,"Frete: "+money(shipping.price||0),"Total: "+money(order.total),"",...order.items.map(x=>x.quantity+"x "+x.name+" - "+money(x.price*x.quantity))].join("\n");
+  const msg=["Olá! Quero fazer este pedido na Eletroshopp.",order.id,"Cliente: "+name,"Telefone: "+phone,"CEP: "+cep,"Endereço: "+address,"Frete: "+money(shipping.price||0),"Total: "+money(order.grandTotal),"",...order.items.map(x=>x.quantity+"x "+x.name+" - "+money(x.price*x.quantity))].join("\n");
   cart=[];save();location.href="https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent(msg);
  }catch(e){toast(e.message||"Erro no pedido");b.disabled=false;b.textContent="Finalizar pedido"}
 }
