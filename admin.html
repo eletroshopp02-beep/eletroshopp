@@ -1,30 +1,10 @@
 <!doctype html>
 <html lang="pt-BR">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#07090e">
-<meta name="description" content="Eletroshopp — aplicativo administrativo">
-<link rel="manifest" href="admin-manifest.json?v=20261004">
-<link rel="stylesheet" href="admin.css?v=20261004-admin-fix">
-<title>Eletroshopp Admin</title>
-</head>
-<body>
-<header class="topbar"><div><strong>ELETROSHOPP</strong><span>Aplicativo administrativo</span></div><a href="./">← Loja</a></header>
-<main>
-<section id="login" class="panel login">
-<h1>Acesso administrativo</h1>
-<p>Digite o PIN de administrador para consultar e gerenciar os pedidos.</p>
-<div class="row"><input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" placeholder="PIN administrativo" aria-label="PIN administrativo"><button id="enter" class="primary" type="button">Entrar</button></div>
-<div id="loginMsg" class="msg" role="status" aria-live="polite"></div>
-</section>
-<section id="app" hidden>
-<div class="toolbar"><div><h1>Pedidos</h1><p id="summary">Carregando...</p></div><div class="actions"><button id="refresh" type="button">↻ Atualizar</button><button id="settingsBtn" type="button">⚙ Remetente</button><button id="logout" type="button">Sair</button></div></div>
-<div id="settings" class="panel settings" hidden><h2>Dados do remetente</h2><div class="grid2"><label>Loja<input id="senderName" value="Eletroshopp"></label><label>CEP<input id="senderCep" value="84261-000"></label><label class="wide">Endereço<input id="senderAddress" placeholder="Rua, número, bairro, complemento"></label><label>Cidade/UF<input id="senderCity" placeholder="Cidade - PR"></label></div><button id="saveSettings" class="primary" type="button">Salvar</button></div>
-<div id="orders" class="orders"></div>
-</section>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#07090e"><meta http-equiv="Cache-Control" content="no-cache"><title>Eletroshopp Admin</title></head>
+<body style="margin:0;background:#07090e;color:#f5f7fb;font:16px system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh;display:grid;place-items:center">
+<main style="width:min(560px,calc(100% - 32px));background:#111722;border:1px solid #273044;border-radius:22px;padding:28px;box-sizing:border-box;text-align:center">
+<div style="font-size:42px">⚡</div><h1 style="margin:8px 0">Eletroshopp Admin</h1><p style="color:#aeb7c7">Painel administrativo separado da loja.</p>
+<a href="https://sybxbyaywznbwipbssso.supabase.co/functions/v1/eletroshopp-admin-app" style="display:block;background:#ed174c;color:#fff;text-decoration:none;padding:16px;border-radius:14px;font-weight:800;margin-top:22px">Abrir painel administrativo</a>
+<a href="/" style="display:block;color:#c7cedb;text-decoration:none;margin-top:18px">← Voltar para a loja</a>
 </main>
-<div id="toast" class="toast" aria-live="polite"></div>
-<script src="admin.js?v=20261004-admin-fix"></script>
-</body>
-</html>
+</body></html>
