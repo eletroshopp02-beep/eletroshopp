@@ -24,8 +24,7 @@ async function api(method="GET",body=null){
   headers:{
    "Content-Type":"application/json",
    "x-admin-pin":pin,
-   "Cache-Control":"no-cache"
-  },
+     },
   body:body?JSON.stringify(body):undefined
  });
  const data=await response.json().catch(()=>({}));
