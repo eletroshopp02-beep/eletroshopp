@@ -1,7 +1,7 @@
 (()=>{"use strict";
 const SUPABASE_URL="https://sybxbyaywznbwipbssso.supabase.co";
 const SUPABASE_KEY="sb_publishable_3iXGUzzTaypiGou7K7UFEw_OW1qKljR";
-const ORIGIN_CEP="84261000";
+const ORIGIN_CEP="84272402";
 const WHATSAPP="5542998157736";
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const money=v=>new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(Number(v)||0);
