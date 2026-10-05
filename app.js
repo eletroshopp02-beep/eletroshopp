@@ -86,10 +86,31 @@ function checkout(){
  $("#orderSummary").innerHTML=cart.map(x=>'<div><span>'+x.qty+'× '+esc(x.name)+'</span><b>'+money(x.price*x.qty)+'</b></div>').join("");
  $("#orderSubtotal").textContent=money(total());close("#cart");open("#checkout");
 }
-async function freight(){
+async function lookupCep(){
+ const cep=$("#cep").value.replace(/\D/g,"");
+ if(cep.length!==8)return;
+ const msg=$("#cepStatus");
+ if(msg)msg.textContent="Consultando CEP…";
+ try{
+  const r=await fetch("https://viacep.com.br/ws/"+cep+"/json/",{cache:"no-store"});
+  const d=await r.json();
+  if(d.erro)throw Error("CEP não encontrado");
+  $("#buyerStreet").value=d.logradouro||"";
+  $("#buyerNeighborhood").value=d.bairro||"";
+  $("#buyerCity").value=d.localidade||"";
+  $("#buyerState").value=d.uf||"";
+  if(msg)msg.textContent=[d.localidade,d.uf].filter(Boolean).join(" - ");
+  $("#buyerNumber").focus();
+  await freight(true);
+ }catch(e){
+  if(msg)msg.textContent=e.message||"CEP não encontrado";
+  $("#freight").innerHTML='<div class="freight-error">Confira o CEP informado.</div>';
+ }
+}
+async function freight(auto=false){
  const cep=$("#cep").value.replace(/\D/g,"");
  if(cep.length!==8)return toast("Digite um CEP válido");
- $("#freight").innerHTML='<div class="loading">Calculando frete…</div>';
+ $("#freight").innerHTML='<div class="loading">'+(auto?"Consultando frete para este CEP…":"Calculando frete…")+'</div>';
  try{
   const productsPayload=cart.map(x=>{const p=products.find(y=>y.id===String(x.id))||{};return{id:Number(x.id)||undefined,code:x.id,name:x.name,quantity:Number(x.qty)||1,value:Number(x.price)||0,category:p.category||"Eletrônicos",weight:Number(p.weight||0.3),width:Number(p.width||15),height:Number(p.height||10),length:Number(p.length||20)}});
   const r=await fetch(SUPABASE_URL+"/functions/v1/frenet-quote",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+SUPABASE_KEY},body:JSON.stringify({fromPostalCode:ORIGIN_CEP,toPostalCode:cep,products:productsPayload})});
@@ -99,8 +120,9 @@ async function freight(){
  }catch(e){$("#freight").innerHTML='<div class="freight-error">'+esc(e.message||"Erro ao calcular frete.")+'</div>'}
 }
 async function finish(){
- const name=$("#buyerName").value.trim(),phone=$("#buyerPhone").value.trim(),cep=$("#cep").value.replace(/\D/g,""),address=$("#buyerAddress").value.trim(),si=document.querySelector('input[name="shipping"]:checked');
- if(!name||!phone||cep.length!==8||!address||!si)return toast("Preencha os dados e selecione o frete");
+ const name=$("#buyerName").value.trim(),phone=$("#buyerPhone").value.trim(),cep=$("#cep").value.replace(/\D/g,""),number=$("#buyerNumber").value.trim(),street=$("#buyerStreet").value.trim(),complement=$("#buyerComplement").value.trim(),neighborhood=$("#buyerNeighborhood").value.trim(),city=$("#buyerCity").value.trim(),uf=$("#buyerState").value.trim(),si=document.querySelector('input[name="shipping"]:checked');
+ const address=[street,number,complement,neighborhood,city&&uf?city+" - "+uf:city].filter(Boolean).join(", ");
+ if(!name||!phone||cep.length!==8||!street||!number||!city||!uf||!si)return toast("Preencha nome, telefone, CEP, endereço e número");
  const shipping=JSON.parse(decodeURIComponent(si.value));
  const order={id:"ESH-"+Date.now(),buyer:{name,phone,cep,address},items:cart.map(x=>({id:x.id,name:x.name,price:x.price,quantity:x.qty})),totalProducts:total(),freight:shipping,grandTotal:total()+Number(shipping.price||0),weight:cart.reduce((n,x)=>{const p=products.find(y=>y.id===String(x.id));return n+(Number(p?.weight||0.3)*(Number(x.qty)||1))},0),createdAt:new Date().toISOString(),payment:"A combinar"};
  const b=$("#finish");b.disabled=true;b.textContent="Enviando…";
@@ -130,9 +152,13 @@ document.addEventListener("click",e=>{
 });
 $("#search").addEventListener("input",e=>{state.search=e.target.value;render()});
 $("#sort").addEventListener("change",e=>{state.sort=e.target.value;render()});
-const phoneEl=$("#buyerPhone"),cepEl=$("#cep");
+const phoneEl=$("#buyerPhone"),cepEl=$("#cep"),numberEl=$("#buyerNumber");
+
 phoneEl?.addEventListener("input",e=>{let v=e.target.value.replace(/\D/g,"").slice(0,11);e.target.value=v.length<=10?v.replace(/(\d{2})(\d{4})(\d{0,4})/,"($1) $2-$3").replace(/-$/,""):v.replace(/(\d{2})(\d{5})(\d{0,4})/,"($1) $2-$3").replace(/-$/,"")});
-cepEl?.addEventListener("input",e=>{let v=e.target.value.replace(/\D/g,"").slice(0,8);e.target.value=v.length>5?v.slice(0,5)+"-"+v.slice(5):v});
+cepEl?.addEventListener("input",e=>{let v=e.target.value.replace(/\D/g,"").slice(0,8);e.target.value=v.length>5?v.slice(0,5)+"-"+v.slice(5):v;$("#freight").innerHTML="";if($("#cepStatus"))$("#cepStatus").textContent=""});
+cepEl?.addEventListener("blur",lookupCep);
+numberEl?.addEventListener("input",()=>{$("#freight").innerHTML=""});
+
 (async()=>{try{products=await getProducts();if(!products.length)throw Error("Catálogo vazio");render();$("#status").textContent=products.length+" produtos disponíveis";}catch(e){console.error(e);$("#status").textContent="Catálogo indisponível";$("#products").innerHTML='<div class="empty">Não foi possível carregar o catálogo.</div>'}})();
 if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=20261004-rebuild10").catch(()=>{}));
 window.Eletroshopp={addToCart:add};
