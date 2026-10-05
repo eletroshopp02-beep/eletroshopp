@@ -42,3 +42,8 @@ body{background:#f5f6f8;color:#17191f;background-image:none}
  .hero-copy p{font-size:10px}
  .hero-products img{height:135px}
 }
+
+.catalog-sentinel{margin:18px 0 80px;padding:16px;text-align:center;color:#7b828d;font-size:12px}
+.catalog-sentinel[hidden]{display:none}
+.whatsapp-float{position:fixed;right:16px;bottom:82px;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#25d366;color:#fff;text-decoration:none;font-size:26px;z-index:90;box-shadow:0 6px 18px #0004;border:2px solid #fff}
+@media(min-width:800px){.whatsapp-float{right:24px;bottom:90px}}
