@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#07090e"><meta http-equiv="Cache-Control" content="no-store"><title>Eletroshopp — Painel Administrativo</title><link rel="stylesheet" href="admin.css?v=20261005-layout2"></head>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#07090e"><link rel="manifest" href="/admin-manifest.json"><meta http-equiv="Cache-Control" content="no-store"><title>Eletroshopp — Painel Administrativo</title><link rel="stylesheet" href="admin.css?v=20261005-layout2"></head>
 <body>
 <header class="mobile-top"><div class="brand-mini">⚡ <b>Eletro<span>shopp</span></b></div><button id="mobileMenu">☰</button></header>
 <div class="admin-shell">
@@ -18,4 +18,4 @@ const p=document.getElementById("pin"),b=document.getElementById("enter"),l=docu
 function go(e){if(e)e.preventDefault();const v=(p?.value||"").replace(/\D/g,"");if(v!=="250808"){if(m)m.textContent="PIN inválido.";return;}try{sessionStorage.setItem("esh-admin-pin",v)}catch(_){}if(l)l.hidden=true;if(a)a.hidden=false}
 b?.addEventListener("click",go);p?.addEventListener("keydown",e=>{if(e.key==="Enter")go(e)});
 })();
-</script></body></html>
+</script><script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/admin-sw.js?v=20261005-1").catch(()=>{})}</script></body></html>
