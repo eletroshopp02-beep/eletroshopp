@@ -1,18 +1,54 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#07090e"><meta name="description" content="Eletroshopp — smartwatches, fones, ferramentas e acessórios."><link rel="manifest" href="manifest.json?v=20261004-rebuild17"><link rel="icon" href="assets/logo.svg"><link rel="stylesheet" href="styles.css?v=20261004-rebuild17"><title>Eletroshopp — Tecnologia no seu dia a dia</title></head><body>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07090e"><meta name="description" content="Eletroshopp — smartwatches, fones, ferramentas e acessórios.">
+<link rel="manifest" href="manifest.json?v=20261005-layout1"><link rel="icon" href="assets/logo.svg">
+<link rel="stylesheet" href="styles.css?v=20261005-layout1"><title>Eletroshopp — Tecnologia no seu dia a dia</title>
+</head>
+<body>
 <div id="splash"><img src="assets/splash.svg" alt="Eletroshopp"><button id="enterShop">Entrar na loja</button></div>
-<header class="top"><a class="brand" href="#" aria-label="Eletroshopp"><img src="assets/logo.svg" alt="Eletroshopp"></a><button class="cart-button" data-open-cart aria-label="Abrir carrinho">🛒 <span id="cartCount">0</span></button></header>
+
+<header class="top">
+  <a class="brand" href="#" aria-label="Eletroshopp"><img src="assets/logo.svg" alt="Eletroshopp"></a>
+  <div class="top-search"><input id="searchTop" placeholder="Buscar produtos..." aria-label="Buscar produtos"></div>
+  <div class="top-actions"><button class="icon-btn" aria-label="Pesquisar" data-focus-search>⌕</button><button class="cart-button" data-open-cart aria-label="Abrir carrinho">🛒 <span id="cartCount">0</span></button><button class="icon-btn" aria-label="Menu">☰</button></div>
+</header>
+
 <main>
-<section class="hero"><div class="hero-copy"><span class="tag">⚡ TECNOLOGIA NO SEU DIA A DIA</span><h1>Seu próximo gadget está aqui.</h1><p>Smartwatches, fones, ferramentas e acessórios para facilitar sua rotina.</p><div class="hero-actions"><button class="primary" data-scroll-catalog>Ver ofertas →</button><button class="secondary" data-open-cart>🛒 Meu carrinho</button></div></div><div class="hero-visual"><div class="hero-glow"></div><img src="assets/logo.svg" alt=""><span>SMARTWATCHES • FONES • ACESSÓRIOS • FERRAMENTAS</span></div></section>
-<section class="quick"><button data-scroll-catalog><b>⌚</b><span>Smartwatches</span></button><button data-category="Fones de Ouvido"><b>🎧</b><span>Fones de ouvido</span></button><button data-category="Ferramentas"><b>🧰</b><span>Ferramentas</span></button><button data-category="Acessórios"><b>🔌</b><span>Acessórios</span></button><button data-category="Games"><b>🎮</b><span>Games</span></button></section>
-<section class="trust"><span>🔒 Compra segura</span><span>🚚 Entrega para todo Brasil</span><span>💳 Pagamento facilitado</span><span>💬 Suporte especializado</span></section>
-<section class="section"><div class="section-head"><div><span class="mini">🔥 MAIS VENDIDOS</span><h2>Os queridinhos da Eletroshopp</h2></div><span class="status" id="status">Carregando catálogo…</span></div><div id="featured" class="rail"></div></section>
-<section class="promo"><div><span>OFERTA ELETROSHOPP</span><h2>Tecnologia no seu dia a dia.</h2><p>Escolha seus produtos, calcule o frete e finalize o pedido pelo WhatsApp.</p></div><button class="primary" data-scroll-catalog>Comprar agora →</button></section>
+<section class="hero hero-store">
+  <div class="hero-copy"><span class="tag">⚡ ELETROSHOPP</span><h1>Tecnologia no<br>seu dia a dia.</h1><p>Smartwatches, fones, ferramentas e acessórios selecionados para você.</p><div class="hero-actions"><button class="primary" data-scroll-catalog>Ver produtos</button><button class="secondary" data-open-cart>🛒 Meu carrinho</button></div></div>
+  <div class="hero-visual"><div class="hero-glow"></div><div class="hero-product"><span class="hero-watch">⌚</span><div><b>SMARTWATCHES</b><small>Tecnologia no seu pulso</small></div></div><span>SMARTWATCHES • FONES • FERRAMENTAS • ACESSÓRIOS</span></div>
+</section>
+
+<section class="quick"><button data-scroll-catalog><b>⌚</b><span>Smartwatch</span></button><button data-category="Fones de Ouvido"><b>🎧</b><span>Fones</span></button><button data-category="Ferramentas"><b>🧰</b><span>Ferramentas</span></button><button data-category="Acessórios"><b>🔌</b><span>Acessórios</span></button><button data-category="Games"><b>🎮</b><span>Games</span></button></section>
+<section class="trust"><span>🚚 <b>Frete rápido</b><small>para todo o Brasil</small></span><span>🛡️ <b>Compra segura</b><small>Seus dados protegidos</small></span><span>💳 <b>Parcele em até</b><small>12x no cartão</small></span></section>
+
+<section class="section"><div class="section-head"><div><span class="mini">🔥 MAIS VENDIDOS</span><h2>Produtos em destaque</h2></div><button class="outline" data-scroll-catalog>Ver todos</button></div><div id="featured" class="rail"></div></section>
+
+<section class="promo"><div><span>OFERTAS ELETROSHOPP</span><h2>Tecnologia no seu dia a dia.</h2><p>Escolha seus produtos, calcule o frete e finalize seu pedido com segurança.</p></div><button class="primary" data-scroll-catalog>Comprar agora →</button></section>
+
 <section id="catalogo" class="section catalog-section"><div class="section-head"><div><span class="mini">CATÁLOGO COMPLETO</span><h2>Encontre seu próximo produto</h2></div><span class="status" id="count"></span></div>
 <div class="toolbar"><input id="search" aria-label="Buscar produtos" placeholder="🔎 Buscar produtos, marcas ou categorias…"><select id="sort" aria-label="Ordenar produtos"><option value="relevance">Relevância</option><option value="priceAsc">Menor preço</option><option value="priceDesc">Maior preço</option></select></div>
 <h3 class="filter-title">CATEGORIAS</h3><div id="cats" class="chips"></div><h3 class="filter-title">MARCAS</h3><div id="brands" class="chips"></div><div id="products" class="grid"></div></section>
 </main>
-<nav class="bottom-nav"><button data-scroll-catalog><span>⌂</span>Início</button><button data-scroll-catalog><span>▦</span>Categorias</button><button data-scroll-catalog><span>🏷</span>Ofertas</button><button data-open-cart><span>🛒</span>Meu pedido</button></nav>
+
+<nav class="bottom-nav"><button data-scroll-catalog><span>⌂</span>Início</button><button data-scroll-catalog><span>▦</span>Categorias</button><button data-scroll-catalog><span>🏷</span>Ofertas</button><button data-open-cart><span>🛒</span>Meu pedido</button><button data-focus-search><span>⌕</span>Buscar</button></nav>
+
 <aside id="cart" class="drawer"><div class="drawer-head"><h2>Seu carrinho</h2><button data-close-cart>✕</button></div><div id="cartItems" class="cart-items"></div><div class="cart-footer"><div><span>Total</span><strong id="cartTotal">R$ 0,00</strong></div><button class="primary full" data-checkout>Continuar pedido</button></div></aside>
-<div id="checkout" class="drawer"><div class="drawer-head"><h2>Finalizar pedido</h2><button data-close-checkout>✕</button></div><div class="checkout"><div id="orderSummary" class="summary"></div><strong>Subtotal: <span id="orderSubtotal">R$ 0,00</span></strong><div class="field"><label for="buyerName">Nome completo</label><input id="buyerName" autocomplete="name" placeholder="Digite seu nome completo"></div><div class="field"><label for="buyerPhone">WhatsApp / telefone</label><input id="buyerPhone" type="tel" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="(42) 99999-9999"></div><div class="field"><label for="cep">CEP de entrega</label><input id="cep" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000"><small id="cepStatus" class="field-status"></small></div><div class="address-grid"><div class="field"><label for="buyerStreet">Rua / Logradouro</label><input id="buyerStreet" autocomplete="street-address" readonly placeholder="Preenchido pelo CEP"></div><div class="field"><label for="buyerNumber">Número</label><input id="buyerNumber" inputmode="numeric" autocomplete="address-line2" placeholder="Número"></div><div class="field"><label for="buyerComplement">Complemento</label><input id="buyerComplement" autocomplete="address-line2" placeholder="Apto, casa, referência"></div><div class="field"><label for="buyerNeighborhood">Bairro</label><input id="buyerNeighborhood" readonly placeholder="Preenchido pelo CEP"></div><div class="field"><label for="buyerCity">Cidade</label><input id="buyerCity" readonly placeholder="Preenchido pelo CEP"></div><div class="field"><label for="buyerState">UF</label><input id="buyerState" readonly placeholder="UF"></div></div><button class="secondary full" data-freight>🚚 Recalcular frete</button><div id="freight" class="freight"></div><button id="finish" class="primary full" data-finish>Finalizar pedido pelo WhatsApp</button></div></div>
+<div id="checkout" class="drawer"><div class="drawer-head"><h2>Finalizar pedido</h2><button data-close-checkout>✕</button></div><div class="checkout"><div id="orderSummary" class="summary"></div><strong>Subtotal: <span id="orderSubtotal">R$ 0,00</span></strong>
+<div class="field"><label for="buyerName">Nome completo</label><input id="buyerName" autocomplete="name" placeholder="Digite seu nome completo"></div>
+<div class="field"><label for="buyerPhone">WhatsApp / telefone</label><input id="buyerPhone" type="tel" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="(42) 99999-9999"></div>
+<div class="field"><label for="cep">CEP de entrega</label><input id="cep" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000"><small id="cepStatus" class="field-status"></small></div>
+<div class="address-grid"><div class="field"><label for="buyerStreet">Rua / Logradouro</label><input id="buyerStreet" autocomplete="street-address" readonly placeholder="Preenchido pelo CEP"></div><div class="field"><label for="buyerNumber">Número</label><input id="buyerNumber" inputmode="numeric" autocomplete="address-line2" placeholder="Número"></div><div class="field"><label for="buyerComplement">Complemento</label><input id="buyerComplement" autocomplete="address-line2" placeholder="Apto, casa, referência"></div><div class="field"><label for="buyerNeighborhood">Bairro</label><input id="buyerNeighborhood" readonly placeholder="Preenchido pelo CEP"></div><div class="field"><label for="buyerCity">Cidade</label><input id="buyerCity" readonly placeholder="Preenchido pelo CEP"></div><div class="field"><label for="buyerState">UF</label><input id="buyerState" readonly placeholder="UF"></div></div>
+<button class="secondary full" data-freight>🚚 Recalcular frete</button><div id="freight" class="freight"></div><button id="finish" class="primary full" data-finish>Finalizar pedido pelo WhatsApp</button></div></div>
 <div id="toast" class="toast"></div>
-<script src="data/store-products.js?v=20261005-rebuild17"></script><script src="app.js?v=20261005-rebuild17"></script><script>document.getElementById("enterShop").onclick=()=>{document.getElementById("splash").classList.add("hide");localStorage.setItem("esh-splash-seen","1")};if(localStorage.getItem("esh-splash-seen")==="1")document.getElementById("splash").classList.add("hide");</script></body></html>
+<script src="data/store-products.js?v=20261005-layout1"></script><script src="app.js?v=20261005-layout1"></script>
+<script>
+document.getElementById("enterShop").onclick=()=>{document.getElementById("splash").classList.add("hide");localStorage.setItem("esh-splash-seen","1")};
+if(localStorage.getItem("esh-splash-seen")==="1")document.getElementById("splash").classList.add("hide");
+const top=document.getElementById("searchTop"),main=document.getElementById("search");
+top?.addEventListener("input",e=>{main.value=e.target.value;main.dispatchEvent(new Event("input",{bubbles:true}))});
+document.addEventListener("click",e=>{if(e.target.closest("[data-focus-search]")){document.getElementById("catalogo")?.scrollIntoView({behavior:"smooth"});setTimeout(()=>main?.focus(),300)}});
+</script>
+</body></html>
