@@ -3,7 +3,7 @@ const SUPABASE_URL="https://sybxbyaywznbwipbssso.supabase.co",SUPABASE_KEY="sb_p
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const money=v=>new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(Number(v)||0);
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const fallback=(name,type="watch")=>{const i=type==="audio"?"🎧":type==="tools"?"🧰":type==="games"?"🎮":"⌚";return"data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 700"><rect width="700" height="700" rx="40" fill="#eef0f4"/><circle cx="350" cy="300" r="180" fill="#ff1744"/><text x="350" y="350" text-anchor="middle" font-size="130">'+i+'</text><text x="350" y="570" text-anchor="middle" font-family="Arial" font-size="28" font-weight="700" fill="#222">'+esc(name).slice(0,28)+'</text></svg>')};
+const fallback=(name,type="watch")=>{const i=type==="audio"?"🎧":type==="tools"?"🧰":type==="games"?"🎮":type==="glasses"?"👓":"⌚";return"data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 700"><rect width="700" height="700" rx="40" fill="#eef0f4"/><circle cx="350" cy="300" r="180" fill="#ff1744"/><text x="350" y="350" text-anchor="middle" font-size="130">'+i+'</text><text x="350" y="570" text-anchor="middle" font-family="Arial" font-size="28" font-weight="700" fill="#222">'+esc(name).slice(0,28)+'</text></svg>')};
 let catalogImages={},catalogImageList=[],products=[],cart=[],state={search:"",category:"",brand:"",sort:"relevance"};
 function norm(v){return String(v??"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g," ").trim()}
 function collectImages(v,key="",out={}){if(typeof v==="string"&&v.startsWith("data:image/")){if(key)out[norm(key)]=v;catalogImageList.push(v);return out}if(Array.isArray(v)){v.forEach((x,i)=>collectImages(x,String(i),out));return out}if(v&&typeof v==="object"){Object.entries(v).forEach(([k,x])=>collectImages(x,k,out));}return out}
@@ -20,14 +20,24 @@ async function loadCatalogImages(){
 function imageFor(p,index){
  const keys=[p.code,p.id,p.name];
  for(const k of keys){const v=catalogImages[norm(k)];if(v)return v}
- if(catalogImageList[index])return catalogImageList[index];
- const n=norm(p.name);const c=norm(p.category);
- if(n.includes("wz06"))return"https://wearzonebrasil.com.br/cdn/shop/files/7_1_0a635579-9c40-455e-8125-f4a80491c1c6.png?v=1745332423";
- if(n.includes("zone buds"))return"https://wearzonebrasil.com.br/cdn/shop/files/8_1_b77af2a7-b34e-449c-be5f-1e1b9a066911.png?v=1745332489";
- if(n.includes("action"))return"https://wearzonebrasil.com.br/cdn/shop/files/vetor_cima_2.png?v=1721154074";
- if(n.includes("pulse"))return"https://wearzonebrasil.com.br/cdn/shop/files/vetoresquerda_2.png?v=1721155685";
- if(n.includes("easy"))return"https://wearzonebrasil.com.br/cdn/shop/files/PRETO_2_9cd57d55-1181-4fd5-900a-c117936703cf.png?v=1743620951";
- return fallback(p.name,c.includes("fone")?"audio":c.includes("ferrament")?"tools":"watch")
+ const n=norm(p.name); const cat=norm(p.category);
+ const supplierImages={
+  "action":"https://wearzonebrasil.com.br/cdn/shop/files/vetor_cima_2.png?v=1721154074",
+  "pulse":"https://wearzonebrasil.com.br/cdn/shop/files/vetoresquerda_2.png?v=1721155685",
+  "easy":"https://wearzonebrasil.com.br/cdn/shop/files/PRETO_2_9cd57d55-1181-4fd5-900a-c117936703cf.png?v=1743620951",
+  "life":"https://wearzonebrasil.com.br/cdn/shop/files/SemTitulo-4.png?v=1742327527",
+  "brave":"https://wearzonebrasil.com.br/cdn/shop/files/8.png?v=1744054971",
+  "flare":"https://wearzonebrasil.com.br/cdn/shop/files/000_1_1.png?v=1767107150",
+  "kron":"https://wearzonebrasil.com.br/cdn/shop/files/G11-_02_077a01e3-743d-461d-a869-24e846242cfb.png?v=1784205183",
+  "wz06":"https://wearzonebrasil.com.br/cdn/shop/files/7_1_0a635579-9c40-455e-8125-f4a80491c1c6.png?v=1745332423",
+  "wz08":"https://wearzonebrasil.com.br/cdn/shop/files/6_1_b23ef4e6-9c94-47de-bc96-2f3b9bc4a662.png?v=1745332561",
+  "zone buds 01":"https://wearzonebrasil.com.br/cdn/shop/files/8_1_b77af2a7-b34e-449c-be5f-1e1b9a066911.png?v=1745332489"
+ };
+ for(const k of Object.keys(supplierImages)){if(n===k||n.includes(k))return supplierImages[k]}
+ if(n.includes("w93")||n.includes("oculos inteligente")||n.includes("m01 pro")){
+  return fallback(p.name,"glasses")
+ }
+ return fallback(p.name,cat.includes("fone")?"audio":cat.includes("ferrament")?"tools":cat.includes("controle")?"games":"watch")
 }
 function normalize(p,i){return{id:String(p.id??p.code??i+1),code:p.code||p.id||"",name:p.name||"Produto Eletroshopp",description:p.description||"Produto do catálogo atualizado do fornecedor.",price:Number(p.price)||0,category:p.category||"Smartwatch",brand:p.brand||"Eletroshopp",image:imageFor(p,i),stock:Number(p.stock??0),weight:Number(p.weight||.3),width:Number(p.width||15),height:Number(p.height||10),length:Number(p.length||20)}}
 async function getProducts(){const base=Array.isArray(window.ELETRO_PRODUCTS)?window.ELETRO_PRODUCTS:[];return base.map(normalize).filter(p=>p.price>0||p.stock===0)}
@@ -40,7 +50,7 @@ function add(id){const p=products.find(x=>x.id===String(id));if(!p)return;const 
 function change(id,d){const x=cart.find(x=>x.id===String(id));if(!x)return;x.qty+=d;if(x.qty<=0)cart=cart.filter(y=>y.id!==x.id);save()}
 function card(p){return'<article class="product-card"><div class="product-image"><img loading="lazy" src="'+p.image+'" alt="'+esc(p.name)+'" onerror="this.onerror=null;this.src=''+fallback(p.name)+''"></div><div class="product-info"><h3>'+esc(p.name)+'</h3><p>'+esc(p.description)+'</p><div class="rating">★★★★★</div><div class="price">'+(p.price?money(p.price):"Consulte")+'</div><button class="add" data-add="'+esc(p.id)+'">🛒 Adicionar</button></div></article>'}
 function filtered(){const q=norm(state.search);let r=products.filter(p=>(!state.category||p.category===state.category)&&(!state.brand||p.brand===state.brand)&&(!q||norm([p.name,p.description,p.category,p.brand].join(" ")).includes(q)));if(state.sort==="priceAsc")r.sort((a,b)=>a.price-b.price);if(state.sort==="priceDesc")r.sort((a,b)=>b.price-a.price);return r}
-function render(){const r=filtered();$("#products").innerHTML=r.length?r.map(card).join(""):'<div class="empty">Nenhum produto encontrado.</div>';$("#count").textContent=r.length+" produtos";const order=["W93 PRO","Zone Buds 01","WZ06","ACTION","BRAVE","FLARE"];const featured=order.map(c=>products.find(p=>p.code===c)).filter(Boolean);products.forEach(p=>{if(!featured.includes(p)&&featured.length<8)featured.push(p)});$("#featured").innerHTML=featured.slice(0,8).map(card).join("");$("#cartCount").textContent=count();renderCart();$$(".category-chips .chip").forEach(b=>b.classList.toggle("active",(b.dataset.category||"")===state.category))}
+function render(){const r=filtered();$("#products").innerHTML=r.length?r.map(card).join(""):'<div class="empty">Nenhum produto encontrado.</div>';$("#count").textContent=r.length+" produtos";const order=["ACTION","BRAVE","FLARE","PULSE","LIFE","KRON","Zone Buds 01","WZ06"];const featured=order.map(c=>products.find(p=>p.code===c)).filter(Boolean);products.forEach(p=>{if(!featured.includes(p)&&featured.length<8)featured.push(p)});$("#featured").innerHTML=featured.slice(0,8).map(card).join("");$("#cartCount").textContent=count();renderCart();$$(".category-chips .chip").forEach(b=>b.classList.toggle("active",(b.dataset.category||"")===state.category))}
 function renderCart(){const c=$("#cartItems");c.innerHTML=cart.length?cart.map(x=>'<div class="cart-row"><img src="'+x.image+'" onerror="this.onerror=null;this.src=''+fallback(x.name)+''"><div class="cart-main"><b>'+esc(x.name)+'</b><small>'+money(x.price)+'</small><div class="qty"><button data-minus="'+esc(x.id)+'">−</button><span>'+x.qty+'</span><button data-plus="'+esc(x.id)+'">+</button><button class="remove" data-remove="'+esc(x.id)+'">Excluir</button></div></div></div>').join(""):'<div class="empty">Seu carrinho está vazio.</div>';$("#cartTotal").textContent=money(total())}
 function checkout(){if(!cart.length)return toast("Adicione um produto primeiro");$("#orderSummary").innerHTML=cart.map(x=>'<div><span>'+x.qty+'× '+esc(x.name)+'</span><b>'+money(x.price*x.qty)+'</b></div>').join("");$("#orderSubtotal").textContent=money(total());close("#cart");open("#checkout")}
 async function lookupCep(){const cep=$("#cep").value.replace(/\D/g,"");if(cep.length!==8)return;$("#cepStatus").textContent="Consultando CEP…";try{const d=await fetch("https://viacep.com.br/ws/"+cep+"/json/",{cache:"no-store"}).then(r=>r.json());if(d.erro)throw Error("CEP não encontrado");$("#buyerStreet").value=d.logradouro||"";$("#buyerNeighborhood").value=d.bairro||"";$("#buyerCity").value=d.localidade||"";$("#buyerState").value=d.uf||"";const m=$("#mapAddress");if(m){m.href="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent([d.logradouro,d.bairro,d.localidade,d.uf,d.cep].filter(Boolean).join(", "));m.hidden=false}$("#cepStatus").textContent=[d.localidade,d.uf].filter(Boolean).join(" - ");await freight(true)}catch(e){$("#cepStatus").textContent=e.message;$("#freight").innerHTML='<div class="freight-error">Confira o CEP informado.</div>'}}
