@@ -63,7 +63,7 @@
   <div class="catalog-search"><input id="search" placeholder="Buscar produtos, modelos ou marcas…"><select id="sort"><option value="relevance">Relevância</option><option value="priceAsc">Menor preço</option><option value="priceDesc">Maior preço</option></select></div>
   <div id="cats" class="chips-hidden"></div>
   <div id="brands" class="chips-hidden"></div>
-  <div id="products" class="product-grid"></div>
+  <div id="products" class="product-grid"></div><div id="catalogSentinel" class="catalog-sentinel">Carregando mais produtos…</div>
 </section>
 </main>
 
@@ -74,6 +74,7 @@
   <button data-open-cart><span>🛒</span>Meu pedido</button>
   <button data-focus-search><span>⌕</span>Buscar</button>
 </nav>
+<a class="whatsapp-float" href="https://wa.me/5542998157736?text=Olá!%20Quero%20comprar%20na%20Eletroshopp." target="_blank" rel="noopener" aria-label="Falar com a Eletroshopp no WhatsApp">💬</a>
 
 <aside id="cart" class="drawer">
   <div class="drawer-head"><h2>Seu carrinho</h2><button data-close-cart>✕</button></div>
@@ -99,8 +100,8 @@
 </div>
 <div id="toast" class="toast"></div><span id="status" hidden></span>
 
-<script src="data/store-products.js?v=20261005-catalog2"></script>
-<script src="app.js?v=20261005-catalogfix3"></script>
+<script src="data/store-products.js?v=20261005-catalogfix4"></script>
+<script src="app.js?v=20261005-catalogfix4"></script>
 <script>
 (()=>{const s=document.getElementById("splash"),b=document.getElementById("enterShop");const enter=()=>{s?.classList.add("hide");try{localStorage.setItem("esh-splash-seen","1")}catch(e){}};b?.addEventListener("click",enter);setTimeout(enter,700);try{if(localStorage.getItem("esh-splash-seen")==="1")s?.classList.add("hide")}catch(e){}})();
 </script>
