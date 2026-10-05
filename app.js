@@ -22,7 +22,6 @@ const knownImages=[
  ["kron","https://wearzonebrasil.com.br/cdn/shop/files/G11-_02_077a01e3-743d-461d-a869-24e846242cfb.png?v=1784205183"]
 ];
 function imageFor(p){
- if(p?.name==="Óculos inteligente W93 PRO")return "https://cdn.shopify.com/s/files/1/0787/9285/1677/files/ChatGPTImage18deago.de2026_20_54_40.png?v=1787097433";
  if(p.image&&String(p.image).trim())return p.image;
  const n=(p.name||"").toLowerCase();
  const k=knownImages.find(x=>n.includes(x[0]));
