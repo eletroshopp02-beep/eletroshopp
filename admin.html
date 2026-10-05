@@ -11,5 +11,11 @@
 <section id="login" class="panel login"><div class="login-icon">🔐</div><h2>Acesso administrativo</h2><p>Digite o PIN de administrador para consultar e gerenciar os pedidos.</p><div class="row"><input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" placeholder="PIN administrativo"><button id="enter" class="primary">Entrar</button></div><div id="loginMsg" class="msg"></div></section>
 <section id="app" hidden><div class="stats"><div class="stat-card"><span>🛒</span><small>Pedidos</small><b id="statOrders">—</b></div><div class="stat-card"><span>👥</span><small>Clientes</small><b>—</b></div><div class="stat-card"><span>💰</span><small>Vendas</small><b>—</b></div></div>
 <div id="ordersSection" class="orders-section"><div class="section-title"><div><span class="eyebrow">GESTÃO DE PEDIDOS</span><h2>Pedidos recentes</h2></div><span id="summary">Carregando...</span></div><div id="orders" class="orders"></div></div></section>
-</main></div><script src="admin.js?v=20261005-layout2"></script><script>document.getElementById("mobileMenu")?.addEventListener("click",()=>document.querySelector(".sidebar")?.classList.toggle("open"));document.querySelector("[data-scroll-orders]")?.addEventListener("click",()=>document.getElementById("ordersSection")?.scrollIntoView({behavior:"smooth"}));document.getElementById("logoutSide")?.addEventListener("click",()=>document.getElementById("logout")?.click());</script>
-</body></html>
+</main></div><script src="admin.js?v=20261005-adminfix3"></script><script>document.getElementById("mobileMenu")?.addEventListener("click",()=>document.querySelector(".sidebar")?.classList.toggle("open"));document.querySelector("[data-scroll-orders]")?.addEventListener("click",()=>document.getElementById("ordersSection")?.scrollIntoView({behavior:"smooth"}));document.getElementById("logoutSide")?.addEventListener("click",()=>document.getElementById("logout")?.click());</script>
+<script>
+(function(){
+const p=document.getElementById("pin"),b=document.getElementById("enter"),l=document.getElementById("login"),a=document.getElementById("app"),m=document.getElementById("loginMsg");
+function go(e){if(e)e.preventDefault();const v=(p?.value||"").replace(/\D/g,"");if(v!=="250808"){if(m)m.textContent="PIN inválido.";return;}try{sessionStorage.setItem("esh-admin-pin",v)}catch(_){}if(l)l.hidden=true;if(a)a.hidden=false}
+b?.addEventListener("click",go);p?.addEventListener("keydown",e=>{if(e.key==="Enter")go(e)});
+})();
+</script></body></html>
