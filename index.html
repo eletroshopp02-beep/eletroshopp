@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07090e"><meta name="description" content="Eletroshopp — smartwatches, fones, ferramentas e acessórios.">
-<link rel="manifest" href="manifest.json?v=20261005-final1"><link rel="icon" href="assets/logo.svg">
-<link rel="stylesheet" href="styles.css?v=20261005-final1"><title>Eletroshopp — Tecnologia no seu dia a dia</title>
+<link rel="manifest" href="manifest.json?v=20261005-final3"><link rel="icon" href="assets/logo.svg">
+<link rel="stylesheet" href="styles.css?v=20261005-final3"><title>Eletroshopp — Tecnologia no seu dia a dia</title>
 </head>
 <body>
 <div id="splash"><img src="assets/splash.svg" alt="Eletroshopp"><button id="enterShop" type="button">Entrar na loja</button></div>
@@ -43,9 +43,9 @@
 <div class="address-grid"><div class="field"><label for="buyerStreet">Rua / Logradouro</label><input id="buyerStreet" autocomplete="street-address" readonly placeholder="Preenchido pelo CEP"></div><div class="field"><label for="buyerNumber">Número</label><input id="buyerNumber" inputmode="numeric" autocomplete="address-line2" placeholder="Número"></div><div class="field"><label for="buyerComplement">Complemento</label><input id="buyerComplement" autocomplete="address-line2" placeholder="Apto, casa, referência"></div><div class="field"><label for="buyerNeighborhood">Bairro</label><input id="buyerNeighborhood" readonly placeholder="Preenchido pelo CEP"></div><div class="field"><label for="buyerCity">Cidade</label><input id="buyerCity" readonly placeholder="Preenchido pelo CEP"></div><div class="field"><label for="buyerState">UF</label><input id="buyerState" readonly placeholder="UF"></div></div>
 <button class="secondary full" data-freight>🚚 Recalcular frete</button><div id="freight" class="freight"></div><button id="finish" class="primary full" data-finish>Finalizar pedido pelo WhatsApp</button></div></div>
 <div id="toast" class="toast"></div>
-<script src="data/store-products.js?v=20261005-final1"></script><script src="app.js?v=20261005-final1"></script>
+<script src="data/store-products.js?v=20261005-final3"></script><script src="app.js?v=20261005-final3"></script>
 <script>
-(function(){const splash=document.getElementById("splash"),btn=document.getElementById("enterShop");function enter(){if(!splash)return;splash.classList.add("hide");try{localStorage.setItem("esh-splash-seen","1")}catch(e){}document.getElementById("catalogo")?.scrollIntoView({block:"start"});}btn?.addEventListener("click",enter);setTimeout(()=>{if(!splash?.classList.contains("hide"))enter()},1200);})();
+(function(){const splash=document.getElementById("splash"),btn=document.getElementById("enterShop");function enter(){if(!splash)return;splash.classList.add("hide");try{localStorage.setItem("esh-splash-seen","1")}catch(e){}document.getElementById("catalogo")?.scrollIntoView({block:"start"});}btn?.addEventListener("click",enter);setTimeout(()=>{if(!splash?.classList.contains("hide"))enter()},400);})();
 try{if(localStorage.getItem("esh-splash-seen")==="1")document.getElementById("splash").classList.add("hide")}catch(e){}
 const top=document.getElementById("searchTop"),main=document.getElementById("search");
 top?.addEventListener("input",e=>{main.value=e.target.value;main.dispatchEvent(new Event("input",{bubbles:true}))});
