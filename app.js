@@ -38,7 +38,7 @@ function normalize(p,i){return{
 async function getProducts(){
  let base=Array.isArray(window.ELETRO_PRODUCTS)?window.ELETRO_PRODUCTS:[];
  if(!base.length){
-  try{const t=await fetch("data/products.json?v=20261005-rebuild15",{cache:"no-store"}).then(r=>r.json());base=t}catch(e){base=[]}
+  try{const t=await fetch("data/products.json?v=20261005-rebuild17",{cache:"no-store"}).then(r=>r.json());base=t}catch(e){base=[]}
  }
  let out=base.map(normalize).filter(p=>p.price>0);
  return out;
@@ -148,6 +148,6 @@ cepEl?.addEventListener("blur",lookupCep);
 numberEl?.addEventListener("input",()=>{$("#freight").innerHTML=""});
 
 (async()=>{try{products=await getProducts();if(!products.length)throw Error("Catálogo vazio");render();$("#status").textContent=products.length+" produtos disponíveis";}catch(e){console.error(e);$("#status").textContent="Catálogo indisponível";$("#products").innerHTML='<div class="empty">Não foi possível carregar o catálogo.</div>'}})();
-if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=20261004-rebuild15").catch(()=>{}));
+if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=20261004-rebuild17").catch(()=>{}));
 window.Eletroshopp={addToCart:add};
 })();
