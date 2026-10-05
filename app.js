@@ -22,7 +22,9 @@ const knownImages=[
  ["kron","https://wearzonebrasil.com.br/cdn/shop/files/G11-_02_077a01e3-743d-461d-a869-24e846242cfb.png?v=1784205183"]
 ];
 function imageFor(p){
- if(p.image&&String(p.image).trim())return p.image;
+ const supplied=String(p.image||"").trim();
+ // URLs from image-search pages are unstable and often expire/block hotlinking.
+ if(supplied && !/tse1\.mm\.bing\.net\/th\?q=/i.test(supplied))return supplied;
  const n=(p.name||"").toLowerCase();
  const k=knownImages.find(x=>n.includes(x[0]));
  if(k)return k[1];
@@ -87,7 +89,9 @@ async function lookupCep(){
   $("#buyerNeighborhood").value=d.bairro||"";
   $("#buyerCity").value=d.localidade||"";
   $("#buyerState").value=d.uf||"";
-  if(msg)msg.textContent=[d.localidade,d.uf].filter(Boolean).join(" - ");
+  const map=$("#mapAddress");
+  if(map){const q=[d.logradouro,d.bairro,d.localidade,d.uf,d.cep].filter(Boolean).join(", ");map.href="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q);map.hidden=false;}
+  if(msg)msg.textContent=[d.logradouro,d.bairro,d.localidade,d.uf].filter(Boolean).join(" • ");
   $("#buyerNumber").focus();
   await freight(true);
  }catch(e){
@@ -143,11 +147,11 @@ $("#sort").addEventListener("change",e=>{state.sort=e.target.value;render()});
 const phoneEl=$("#buyerPhone"),cepEl=$("#cep"),numberEl=$("#buyerNumber");
 
 phoneEl?.addEventListener("input",e=>{let v=e.target.value.replace(/\D/g,"").slice(0,11);e.target.value=v.length<=10?v.replace(/(\d{2})(\d{4})(\d{0,4})/,"($1) $2-$3").replace(/-$/,""):v.replace(/(\d{2})(\d{5})(\d{0,4})/,"($1) $2-$3").replace(/-$/,"")});
-cepEl?.addEventListener("input",e=>{let v=e.target.value.replace(/\D/g,"").slice(0,8);e.target.value=v.length>5?v.slice(0,5)+"-"+v.slice(5):v;$("#freight").innerHTML="";if($("#cepStatus"))$("#cepStatus").textContent=""});
+cepEl?.addEventListener("input",e=>{let v=e.target.value.replace(/\D/g,"").slice(0,8);e.target.value=v.length>5?v.slice(0,5)+"-"+v.slice(5):v;$("#freight").innerHTML="";if($("#cepStatus"))$("#cepStatus").textContent="";if(v.length===8){clearTimeout(window.__cepTimer);window.__cepTimer=setTimeout(()=>lookupCep(),250)}});
 cepEl?.addEventListener("blur",lookupCep);
-numberEl?.addEventListener("input",()=>{$("#freight").innerHTML=""});
+numberEl?.addEventListener("input",()=>{clearTimeout(window.__numberTimer);$("#freight").innerHTML="";if($("#cep").value.replace(/\D/g,"").length===8&&numberEl.value.trim()){window.__numberTimer=setTimeout(()=>freight(true),450)}});
 
-(async()=>{try{products=await getProducts();if(!products.length)throw Error("Catálogo vazio");render();$("#status").textContent=products.length+" produtos disponíveis";}catch(e){console.error(e);$("#status").textContent="Catálogo indisponível";$("#products").innerHTML='<div class="empty">Não foi possível carregar o catálogo.</div>'}})();
+(async()=>{try{products=await getProducts();if(!products.length)throw Error("Catálogo vazio");render();if($("#status"))$("#status").textContent=products.length+" produtos disponíveis";}catch(e){console.error(e);if($("#status"))$("#status").textContent="Catálogo indisponível";$("#products").innerHTML='<div class="empty">Não foi possível carregar o catálogo.</div>'}})();
 if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=20261004-rebuild17").catch(()=>{}));
 window.Eletroshopp={addToCart:add};
 })();
