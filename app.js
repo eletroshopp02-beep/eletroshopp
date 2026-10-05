@@ -74,8 +74,52 @@ function render(){
 }
 function renderCart(){const c=$("#cartItems");if(!c)return;c.innerHTML=cart.length?cart.map(x=>{const fb=encodeURIComponent(fallback(x.name));return '<div class="cart-row"><img src="'+esc(x.image)+'" data-fallback="'+fb+'" onerror="this.onerror=null;this.src=decodeURIComponent(this.dataset.fallback)"><div class="cart-main"><b>'+esc(x.name)+'</b><small>'+money(x.price)+'</small><div class="qty"><button data-minus="'+esc(x.id)+'">−</button><span>'+x.qty+'</span><button data-plus="'+esc(x.id)+'">+</button><button class="remove" data-remove="'+esc(x.id)+'">Excluir</button></div></div></div>'}).join(""):'<div class="empty">Seu carrinho está vazio.</div>';$("#cartTotal").textContent=money(total())}
 function checkout(){if(!cart.length)return toast("Adicione um produto primeiro");$("#orderSummary").innerHTML=cart.map(x=>'<div><span>'+x.qty+'× '+esc(x.name)+'</span><b>'+money(x.price*x.qty)+'</b></div>').join("");$("#orderSubtotal").textContent=money(total());close("#cart");open("#checkout")}
-async function lookupCep(){const cep=$("#cep").value.replace(/\D/g,"");if(cep.length!==8)return;$("#cepStatus").textContent="Consultando CEP…";try{const d=await fetch("https://viacep.com.br/ws/"+cep+"/json/",{cache:"no-store"}).then(r=>r.json());if(d.erro)throw Error("CEP não encontrado");$("#buyerStreet").value=d.logradouro||"";$("#buyerNeighborhood").value=d.bairro||"";$("#buyerCity").value=d.localidade||"";$("#buyerState").value=d.uf||"";const m=$("#mapAddress");if(m){m.href="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent([d.logradouro,d.bairro,d.localidade,d.uf,d.cep].filter(Boolean).join(", "));m.textContent="📍 Ver endereço no Google Maps";m.hidden=false}$("#cepStatus").textContent=[d.localidade,d.uf].filter(Boolean).join(" - ");await freight(true)}catch(e){$("#cepStatus").textContent=e.message;$("#freight").innerHTML='<div class="freight-error">Confira o CEP informado.</div>'}}
-async function freight(auto=false){const cep=$("#cep").value.replace(/\D/g,"");if(cep.length!==8)return;$("#freight").innerHTML='<div class="loading">'+(auto?"Consultando frete para este CEP…":"Calculando frete…")+"</div>";try{const payload=cart.map(x=>{const p=products.find(y=>y.id===x.id)||{};return{id:Number(x.id)||undefined,code:x.id,name:x.name,quantity:x.qty,value:x.price,category:p.category,weight:p.weight,width:p.width,height:p.height,length:p.length}});const r=await fetch(SUPABASE_URL+"/functions/v1/frenet-quote",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+SUPABASE_KEY},body:JSON.stringify({fromPostalCode:ORIGIN_CEP,toPostalCode:cep,products:payload})});const d=await r.json().catch(()=>({}));if(!r.ok||!Array.isArray(d.quotes)||!d.quotes.length)throw Error(d.error||d.message||"Nenhuma opção de frete encontrada.");$("#freight").innerHTML=d.quotes.slice(0,4).map((q,i)=>'<label class="freight-option"><input type="radio" name="shipping" value="'+encodeURIComponent(JSON.stringify(q))+'" '+(i?"":"checked")+'><span><b>'+esc(q.name||q.company||"Entrega")+'</b><small>'+esc(String(q.days||"")+" dias")+'</small></span><strong>'+money(q.price)+'</strong></label>').join("")}catch(e){$("#freight").innerHTML='<div class="freight-error">'+esc(e.message||"Erro ao calcular frete.")+"</div>"}}
+async function lookupCep(){
+ const cep=$("#cep").value.replace(/\D/g,"");
+ if(cep.length!==8)return;
+ $("#cepStatus").textContent="Validando CEP…";
+ try{
+  const [via,brasil]=await Promise.allSettled([
+   fetch("https://viacep.com.br/ws/"+cep+"/json/",{cache:"no-store"}).then(r=>r.ok?r.json():Promise.reject(Error("ViaCEP indisponível"))),
+   fetch("https://brasilapi.com.br/api/cep/v2/"+cep,{cache:"no-store"}).then(r=>r.ok?r.json():Promise.reject(Error("BrasilAPI indisponível")))
+  ]);
+  const a=via.status==="fulfilled"&&!via.value.erro?via.value:null;
+  const b=brasil.status==="fulfilled"?brasil.value:null;
+  const d=a||b;
+  if(!d)throw Error("CEP não encontrado");
+  const street=a?.logradouro||b?.street||"";
+  const neighborhood=a?.bairro||b?.neighborhood||"";
+  const city=a?.localidade||b?.city||"";
+  const uf=a?.uf||b?.state||"";
+  const street2=b?.street||"";
+  const city2=b?.city||"";
+  const uf2=b?.state||"";
+  if(a&&b&&((street&&street2&&norm(street)!==norm(street2))||(city&&city2&&norm(city)!==norm(city2))||(uf&&uf2&&norm(uf)!==norm(uf2)))){
+   throw Error("As bases de CEP retornaram endereços diferentes. Confira o CEP.");
+  }
+  if(!street||!city||!uf)throw Error("CEP sem endereço completo");
+  $("#buyerStreet").value=street;
+  $("#buyerNeighborhood").value=neighborhood;
+  $("#buyerCity").value=city;
+  $("#buyerState").value=uf;
+  const m=$("#mapAddress");
+  if(m){
+   m.href="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent([street,$("#buyerNumber").value.trim(),neighborhood,city,uf,cep].filter(Boolean).join(", "));
+   m.textContent="📍 Conferir endereço no Google Maps";
+   m.hidden=false;
+  }
+  $("#cepStatus").textContent=[street,neighborhood,city,uf].filter(Boolean).join(" • ");
+  await freight(true);
+ }catch(e){
+  $("#buyerStreet").value="";
+  $("#buyerNeighborhood").value="";
+  $("#buyerCity").value="";
+  $("#buyerState").value="";
+  const m=$("#mapAddress");if(m)m.hidden=true;
+  $("#cepStatus").textContent=e.message||"Não foi possível validar o CEP";
+  $("#freight").innerHTML='<div class="freight-error">'+esc(e.message||"Confira o CEP informado.")+'</div>';
+ }
+}async function freight(auto=false){const cep=$("#cep").value.replace(/\D/g,"");if(cep.length!==8)return;$("#freight").innerHTML='<div class="loading">'+(auto?"Consultando frete para este CEP…":"Calculando frete…")+"</div>";try{const payload=cart.map(x=>{const p=products.find(y=>y.id===x.id)||{};return{id:Number(x.id)||undefined,code:x.id,name:x.name,quantity:x.qty,value:x.price,category:p.category,weight:p.weight,width:p.width,height:p.height,length:p.length}});const r=await fetch(SUPABASE_URL+"/functions/v1/frenet-quote",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+SUPABASE_KEY},body:JSON.stringify({fromPostalCode:ORIGIN_CEP,toPostalCode:cep,products:payload})});const d=await r.json().catch(()=>({}));if(!r.ok||!Array.isArray(d.quotes)||!d.quotes.length)throw Error(d.error||d.message||"Nenhuma opção de frete encontrada.");$("#freight").innerHTML=d.quotes.slice(0,4).map((q,i)=>'<label class="freight-option"><input type="radio" name="shipping" value="'+encodeURIComponent(JSON.stringify(q))+'" '+(i?"":"checked")+'><span><b>'+esc(q.name||q.company||"Entrega")+'</b><small>'+esc(String(q.days||"")+" dias")+'</small></span><strong>'+money(q.price)+'</strong></label>').join("")}catch(e){$("#freight").innerHTML='<div class="freight-error">'+esc(e.message||"Erro ao calcular frete.")+"</div>"}}
 async function finish(){const name=$("#buyerName").value.trim(),phone=$("#buyerPhone").value.trim(),cep=$("#cep").value.replace(/\D/g,""),number=$("#buyerNumber").value.trim(),street=$("#buyerStreet").value.trim(),complement=$("#buyerComplement").value.trim(),neighborhood=$("#buyerNeighborhood").value.trim(),city=$("#buyerCity").value.trim(),uf=$("#buyerState").value.trim(),si=document.querySelector('input[name="shipping"]:checked');if(!name||!phone||cep.length!==8||!street||!number||!city||!uf||!si)return toast("Preencha nome, telefone, CEP, endereço e número");const shipping=JSON.parse(decodeURIComponent(si.value)),address=[street,number,complement,neighborhood,city+" - "+uf].filter(Boolean).join(", "),order={id:"ESH-"+Date.now(),buyer:{name,phone,cep,address},items:cart.map(x=>({id:x.id,name:x.name,price:x.price,quantity:x.qty})),totalProducts:total(),freight:shipping,grandTotal:total()+Number(shipping.price||0),weight:cart.reduce((n,x)=>n+(Number(products.find(p=>p.id===x.id)?.weight||.3)*x.qty),0),createdAt:new Date().toISOString(),payment:"A combinar"};const b=$("#finish");b.disabled=true;b.textContent="Enviando…";try{const r=await fetch(SUPABASE_URL+"/functions/v1/create-order",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+SUPABASE_KEY},body:JSON.stringify(order)});const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||"Não foi possível registrar o pedido");const msg=["Olá! Quero fazer este pedido na Eletroshopp.",order.id,"Cliente: "+name,"Telefone: "+phone,"CEP: "+cep,"Endereço: "+address,"Frete: "+money(shipping.price||0),"Total: "+money(order.grandTotal),"",...order.items.map(x=>x.quantity+"x "+x.name+" - "+money(x.price*x.quantity))].join("\n");cart=[];save();location.href="https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent(msg)}catch(e){toast(e.message||"Erro no pedido");b.disabled=false;b.textContent="Finalizar pedido pelo WhatsApp"}}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-add],[data-category],[data-open-cart],[data-close-cart],[data-checkout],[data-close-checkout],[data-freight],[data-finish],[data-scroll-catalog],[data-scroll-top],[data-focus-search],[data-minus],[data-plus],[data-remove]");if(!b)return;if(b.dataset.add!==undefined)add(b.dataset.add);else if(b.dataset.category!==undefined){state.category=b.dataset.category;state.limit=12;render();$("#catalogo")?.scrollIntoView({behavior:"smooth"})}else if(b.dataset.openCart!==undefined)open("#cart");else if(b.dataset.closeCart!==undefined)close("#cart");else if(b.dataset.checkout!==undefined)checkout();else if(b.dataset.closeCheckout!==undefined)close("#checkout");else if(b.dataset.freight!==undefined)freight();else if(b.dataset.finish!==undefined)finish();else if(b.dataset.scrollCatalog!==undefined)$("#catalogo")?.scrollIntoView({behavior:"smooth"});else if(b.dataset.scrollTop!==undefined)window.scrollTo({top:0,behavior:"smooth"});else if(b.dataset.focusSearch!==undefined){$("#catalogo")?.scrollIntoView({behavior:"smooth"});setTimeout(()=>$("#search")?.focus(),250)}else if(b.dataset.minus!==undefined)change(b.dataset.minus,-1);else if(b.dataset.plus!==undefined)change(b.dataset.plus,1);else if(b.dataset.remove!==undefined){cart=cart.filter(x=>x.id!==b.dataset.remove);save()}});
 $("#search").addEventListener("input",e=>{state.search=e.target.value;state.limit=12;$("#searchTop").value=e.target.value;render()});$("#searchTop").addEventListener("input",e=>{state.search=e.target.value;state.limit=12;$("#search").value=e.target.value;render()});$("#sort").addEventListener("change",e=>{state.sort=e.target.value;state.limit=12;render()});
