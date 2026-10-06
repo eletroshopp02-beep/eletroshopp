@@ -68,6 +68,45 @@ function printDoc(order,label){
  win.document.close();
  setTimeout(()=>win.print(),400);
 }
+function updateFinance(list){
+ const valid=(Array.isArray(list)?list:[]).filter(o=>String(o.status||"novo")!=="cancelado");
+ const marginInput=$("#profitMargin");
+ const margin=Math.max(0,Math.min(100,Number(marginInput?.value)||30));
+ if(marginInput && !marginInput.dataset.bound){
+  marginInput.dataset.bound="1";
+  marginInput.addEventListener("change",()=>{localStorage.setItem("esh-profit-margin",String(Math.max(0,Math.min(100,Number(marginInput.value)||0))));updateFinance(orders);});
+  const saved=localStorage.getItem("esh-profit-margin");
+  if(saved!==null) marginInput.value=saved;
+ }
+ const marginNow=Math.max(0,Math.min(100,Number(marginInput?.value)||Number(localStorage.getItem("esh-profit-margin"))||30));
+ const revenue=valid.reduce((sum,o)=>sum+Number(o.grand_total||0),0);
+ const products=valid.reduce((sum,o)=>sum+Number(o.total_products||0),0);
+ const freight=valid.reduce((sum,o)=>sum+Number((o.freight||{}).price||0),0);
+ const profit=products*(marginNow/100);
+ const ticket=valid.length?revenue/valid.length:0;
+ $("#statRevenue")&&( $("#statRevenue").textContent=money(revenue) );
+ $("#statProfit")&&( $("#statProfit").textContent=money(profit) );
+ $("#financeRevenue")&&( $("#financeRevenue").textContent=money(revenue) );
+ $("#financeFreight")&&( $("#financeFreight").textContent=money(freight) );
+ $("#financeTicket")&&( $("#financeTicket").textContent=money(ticket) );
+ $("#financeProfit")&&( $("#financeProfit").textContent=money(profit) );
+ $("#chartTotal")&&( $("#chartTotal").textContent=money(revenue) );
+ const chart=$("#salesChart");
+ if(!chart)return;
+ const days=[];
+ const today=new Date(); today.setHours(0,0,0,0);
+ for(let i=6;i>=0;i--){
+  const d=new Date(today); d.setDate(today.getDate()-i);
+  days.push({key:d.toISOString().slice(0,10),label:d.toLocaleDateString("pt-BR",{weekday:"short"}).replace(".","")+" "+String(d.getDate()).padStart(2,"0")});
+ }
+ const values=days.map(day=>valid.filter(o=>o.created_at&&new Date(o.created_at).toISOString().slice(0,10)===day.key).reduce((sum,o)=>sum+Number(o.grand_total||0),0));
+ const max=Math.max(...values,1);
+ chart.innerHTML=days.map((day,i)=>{
+  const value=values[i], height=Math.max(3,(value/max)*145);
+  return "<div class='chart-col'><div class='chart-value'>"+esc(value?money(value):"R$ 0")+"</div><div class='chart-bar' style='height:"+height+"px' title='"+esc(day.label+": "+money(value))+"'></div><div class='chart-label'>"+esc(day.label)+"</div></div>";
+ }).join("");
+}
+
 function render(list){
  const safeList=Array.isArray(list)?list:[];
  const summary=$("#summary");
@@ -75,6 +114,7 @@ function render(list){
  const stat=$("#statOrders");
  if(summary) summary.textContent=safeList.length+" pedido(s)";
  if(stat) stat.textContent=safeList.length;
+ updateFinance(safeList);
  if(!ordersEl) return;
  if(!safeList.length){
   ordersEl.innerHTML="<div class='empty'>Nenhum pedido encontrado.</div>";
