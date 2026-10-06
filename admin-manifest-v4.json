@@ -1,0 +1,1 @@
+{"name":"Eletroshopp Admin","short_name":"ESH Admin","id":"/eletroshopp-admin-v4/","start_url":"/admin/","scope":"/admin/","display":"standalone","background_color":"#07090e","theme_color":"#ff1744","description":"Painel administrativo Eletroshopp","icons":[{"src":"/assets/admin-icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}
