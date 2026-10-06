@@ -107,6 +107,26 @@ function updateFinance(list){
  }).join("");
 }
 
+function accountingData(){try{return JSON.parse(localStorage.getItem("esh-accounting-data")||"{}")}catch{return {}}}
+function saveAccountingData(d){localStorage.setItem("esh-accounting-data",JSON.stringify(d))}
+function accountingMonth(){const el=$("#accountingMonth");if(!el)return "";if(!el.value){const d=new Date();el.value=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")}return el.value}
+function updateAccounting(list){
+ const data=accountingData(),costs=data.costs||{},expenses=data.expenses||[],month=accountingMonth();
+ const valid=(Array.isArray(list)?list:[]).filter(o=>o.status!=="cancelado"&&monthKey(o.created_at)===month),products={};
+ valid.forEach(o=>(o.items||[]).forEach(i=>{const k=String(i.id||i.name);products[k]??={id:i.id||"",name:i.name||"Produto",qty:0,sales:0};products[k].qty+=Number(i.quantity||1);products[k].sales+=Number(i.price||0)*Number(i.quantity||1)}));
+ const rows=Object.values(products).map(p=>{const key=String(p.id||p.name),has=Object.prototype.hasOwnProperty.call(costs,key),unit=Number(costs[key]||0);return {...p,key,has,unit,cost:unit*p.qty,profit:p.sales-unit*p.qty}});
+ const known=rows.filter(p=>p.has),exp=expenses.filter(e=>e.month===month),expenseTotal=exp.reduce((a,e)=>a+Number(e.value||0),0),net=known.reduce((a,p)=>a+p.profit,0)-expenseTotal,pending=rows.length-known.length;
+ $("#financeRevenue")&&($("#financeRevenue").textContent=money(valid.reduce((a,o)=>a+Number(o.grand_total||0),0)));
+ $("#financeFreight")&&($("#financeFreight").textContent=money(valid.reduce((a,o)=>a+Number((o.freight||{}).price||0),0)));
+ $("#financeTicket")&&($("#financeTicket").textContent=money(valid.length?valid.reduce((a,o)=>a+Number(o.grand_total||0),0)/valid.length:0));
+ $("#financeProfit")&&($("#financeProfit").textContent=(pending?"~ ":"")+money(net));
+ $("#statProfit")&&($("#statProfit").textContent=(pending?"~ ":"")+money(net));
+ const ce=$("#costsList"); if(ce){const all={},orders=(Array.isArray(list)?list:[]).filter(o=>o.status!=="cancelado");orders.forEach(o=>(o.items||[]).forEach(i=>{const k=String(i.id||i.name);all[k]={id:i.id||"",name:i.name||"Produto"}}));ce.innerHTML=Object.values(all).sort((a,b)=>a.name.localeCompare(b.name)).map(p=>{const k=String(p.id||p.name),v=costs[k];return "<div class='cost-row "+(v==null?"pending":"")+"'><div><strong>"+esc(p.name)+"</strong><small>"+(v==null?"Custo não informado":"Custo por unidade")+"</small></div><input class='cost-input' data-cost='"+esc(k)+"' type='number' min='0' step='0.01' value='"+(v==null?"":v)+"' placeholder='R$ 0,00'></div>"}).join("")||"<div class='empty-mini'>Nenhum produto vendido ainda.</div>"}
+ const ee=$("#expensesList");if(ee)ee.innerHTML=exp.map(e=>"<div class='expense-row'><div><b>"+esc(e.desc)+"</b><small>"+e.month+"</small></div><b>"+money(e.value)+"</b><button class='delete-expense' data-expense='"+esc(e.id)+"'>×</button></div>").join("")||"<div class='empty-mini'>Nenhuma despesa neste mês.</div>";
+ const pr=$("#profitRanking");if(pr)pr.innerHTML=rows.sort((a,b)=>b.profit-a.profit).map(p=>"<tr><td><b>"+esc(p.name)+"</b></td><td>"+p.qty+"</td><td>"+money(p.sales)+"</td><td>"+(p.has?money(p.cost):"—")+"</td><td class='"+(p.has?"profit-good":"profit-pending")+"'>"+(p.has?money(p.profit):"Pendente")+"</td><td>"+(p.has&&p.sales?(p.profit/p.sales*100).toFixed(1)+"%":"—")+"</td></tr>").join("")||"<tr><td colspan='6' class='empty-mini'>Nenhuma venda neste mês.</td></tr>";
+ const title=$("#finance")?.querySelector(".finance-head p");if(title)title.textContent="Mês "+month+" • "+valid.length+" pedido(s) • "+(pending?"Há produtos sem custo cadastrado.":"Todos os custos estão cadastrados.");
+}
+function monthKey(date){const d=new Date(date);return isNaN(d)?"":d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")}
 function render(list){
  const safeList=Array.isArray(list)?list:[];
  const summary=$("#summary");
@@ -115,6 +135,7 @@ function render(list){
  if(summary) summary.textContent=safeList.length+" pedido(s)";
  if(stat) stat.textContent=safeList.length;
  updateFinance(safeList);
+ updateAccounting(safeList);
  if(!ordersEl) return;
  if(!safeList.length){
   ordersEl.innerHTML="<div class='empty'>Nenhum pedido encontrado.</div>";
