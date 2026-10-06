@@ -196,8 +196,17 @@ function init(){
  input.addEventListener("keydown",(event)=>{if(event.key==="Enter") login();});
  refresh?.addEventListener("click",loadOrders);
  logoutButton?.addEventListener("click",logout);
+ const month=$("#accountingMonth");if(month){month.value=accountingMonth();month.addEventListener("change",()=>updateAccounting(orders))}
+ $("#addExpense")?.addEventListener("click",()=>{
+  const desc=($("#expenseDesc")?.value||"").trim(),value=Number($("#expenseValue")?.value||0);
+  if(!desc||value<=0){alert("Informe descrição e valor.");return}
+  const d=accountingData();d.expenses=Array.isArray(d.expenses)?d.expenses:[];d.expenses.push({id:"EXP-"+Date.now(),desc,value,month:accountingMonth()});saveAccountingData(d);
+  if($("#expenseDesc"))$("#expenseDesc").value="";if($("#expenseValue"))$("#expenseValue").value="";updateAccounting(orders);
+ });
 
  document.addEventListener("change",async(event)=>{
+  const cost=event.target?.dataset?.cost;
+  if(cost){const d=accountingData();d.costs=d.costs||{};const v=Number(event.target.value||0);if(v>0)d.costs[cost]=v;else delete d.costs[cost];saveAccountingData(d);updateAccounting(orders);return}
   const id=event.target?.dataset?.status;
   if(!id)return;
   try{await api("POST",{id,status:event.target.value});await loadOrders();}
@@ -205,6 +214,8 @@ function init(){
  });
 
  document.addEventListener("click",(event)=>{
+  const expense=event.target?.dataset?.expense;
+  if(expense){const d=accountingData();d.expenses=(d.expenses||[]).filter(x=>x.id!==expense);saveAccountingData(d);updateAccounting(orders);return}
   const printId=event.target?.dataset?.print;
   const labelId=event.target?.dataset?.label;
   if(printId){const order=orders.find((item)=>item.id===printId);if(order)printDoc(order,false);}
