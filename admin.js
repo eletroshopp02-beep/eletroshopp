@@ -70,43 +70,23 @@ function printDoc(order,label){
 }
 function updateFinance(list){
  const valid=(Array.isArray(list)?list:[]).filter(o=>String(o.status||"novo")!=="cancelado");
- const marginInput=$("#profitMargin");
- const margin=Math.max(0,Math.min(100,Number(marginInput?.value)||30));
- if(marginInput && !marginInput.dataset.bound){
-  marginInput.dataset.bound="1";
-  marginInput.addEventListener("change",()=>{localStorage.setItem("esh-profit-margin",String(Math.max(0,Math.min(100,Number(marginInput.value)||0))));updateFinance(orders);});
-  const saved=localStorage.getItem("esh-profit-margin");
-  if(saved!==null) marginInput.value=saved;
- }
- const marginNow=Math.max(0,Math.min(100,Number(marginInput?.value)||Number(localStorage.getItem("esh-profit-margin"))||30));
  const revenue=valid.reduce((sum,o)=>sum+Number(o.grand_total||0),0);
- const products=valid.reduce((sum,o)=>sum+Number(o.total_products||0),0);
  const freight=valid.reduce((sum,o)=>sum+Number((o.freight||{}).price||0),0);
- const profit=products*(marginNow/100);
  const ticket=valid.length?revenue/valid.length:0;
- $("#statRevenue")&&( $("#statRevenue").textContent=money(revenue) );
- $("#statProfit")&&( $("#statProfit").textContent=money(profit) );
- $("#financeRevenue")&&( $("#financeRevenue").textContent=money(revenue) );
- $("#financeFreight")&&( $("#financeFreight").textContent=money(freight) );
- $("#financeTicket")&&( $("#financeTicket").textContent=money(ticket) );
- $("#financeProfit")&&( $("#financeProfit").textContent=money(profit) );
- $("#chartTotal")&&( $("#chartTotal").textContent=money(revenue) );
+ $("#statRevenue")&&($("#statRevenue").textContent=money(revenue));
+ $("#financeRevenue")&&($("#financeRevenue").textContent=money(revenue));
+ $("#financeFreight")&&($("#financeFreight").textContent=money(freight));
+ $("#financeTicket")&&($("#financeTicket").textContent=money(ticket));
+ $("#chartTotal")&&($("#chartTotal").textContent=money(revenue));
  const chart=$("#salesChart");
  if(!chart)return;
  const days=[];
  const today=new Date(); today.setHours(0,0,0,0);
- for(let i=6;i>=0;i--){
-  const d=new Date(today); d.setDate(today.getDate()-i);
-  days.push({key:d.toISOString().slice(0,10),label:d.toLocaleDateString("pt-BR",{weekday:"short"}).replace(".","")+" "+String(d.getDate()).padStart(2,"0")});
- }
+ for(let i=6;i>=0;i--){const d=new Date(today);d.setDate(today.getDate()-i);days.push({key:d.toISOString().slice(0,10),label:d.toLocaleDateString("pt-BR",{weekday:"short"}).replace(".","")+" "+String(d.getDate()).padStart(2,"0")});}
  const values=days.map(day=>valid.filter(o=>o.created_at&&new Date(o.created_at).toISOString().slice(0,10)===day.key).reduce((sum,o)=>sum+Number(o.grand_total||0),0));
  const max=Math.max(...values,1);
- chart.innerHTML=days.map((day,i)=>{
-  const value=values[i], height=Math.max(3,(value/max)*145);
-  return "<div class='chart-col'><div class='chart-value'>"+esc(value?money(value):"R$ 0")+"</div><div class='chart-bar' style='height:"+height+"px' title='"+esc(day.label+": "+money(value))+"'></div><div class='chart-label'>"+esc(day.label)+"</div></div>";
- }).join("");
+ chart.innerHTML=days.map((day,i)=>{const value=values[i],height=Math.max(3,(value/max)*145);return "<div class='chart-col'><div class='chart-value'>"+esc(value?money(value):"R$ 0")+"</div><div class='chart-bar' style='height:"+height+"px' title='"+esc(day.label+": "+money(value))+"'></div><div class='chart-label'>"+esc(day.label)+"</div></div>";}).join("");
 }
-
 function accountingData(){try{return JSON.parse(localStorage.getItem("esh-accounting-data")||"{}")}catch{return {}}}
 function saveAccountingData(d){localStorage.setItem("esh-accounting-data",JSON.stringify(d))}
 function accountingMonth(){const el=$("#accountingMonth");if(!el)return "";if(!el.value){const d=new Date();el.value=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")}return el.value}
@@ -127,7 +107,7 @@ function updateAccounting(list){
  const mc=$("#monthlyChart");if(mc){
   const now=new Date(),months=[];
   for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push({key:d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"),label:d.toLocaleDateString("pt-BR",{month:"short",year:"2-digit"}).replace(".","")})}
-  const vals=months.map(m=>all.filter(o=>monthKey(o.created_at)===m.key).reduce((a,o)=>a+Number(o.grand_total||0),0)),mx=Math.max(...vals,1);
+  const monthOrders=(Array.isArray(list)?list:[]).filter(o=>o.status!=="cancelado"); const vals=months.map(m=>monthOrders.filter(o=>monthKey(o.created_at)===m.key).reduce((a,o)=>a+Number(o.grand_total||0),0)),mx=Math.max(...vals,1);
   mc.innerHTML=months.map((m,i)=>"<div class='monthly-col'><div class='monthly-value'>"+money(vals[i])+"</div><div class='monthly-bar' style='height:"+Math.max(4,120*vals[i]/mx)+"px'></div><div class='monthly-label'>"+esc(m.label)+"</div></div>").join("");
  }
  const title=$("#finance")?.querySelector(".finance-head p");if(title)title.textContent="Mês "+month+" • "+valid.length+" pedido(s) • "+(pending?"Há produtos sem custo cadastrado.":"Todos os custos estão cadastrados.");
@@ -160,6 +140,8 @@ function render(list){
 }
 
 async function loadOrders(){
+ const refresh=$("#refresh");
+ if(refresh){refresh.disabled=true;refresh.classList.add("is-loading");refresh.textContent="↻ Atualizando...";}
  try{
   const data=await api("GET");
   orders=Array.isArray(data)?data:(Array.isArray(data.orders)?data.orders:[]);
@@ -171,9 +153,10 @@ async function loadOrders(){
   if(summary) summary.textContent="Erro ao consultar pedidos";
   const msg=$("#loginMsg");
   if(msg) msg.textContent="Acesso aceito, mas não foi possível carregar os pedidos: "+error.message;
+ }finally{
+  if(refresh){refresh.disabled=false;refresh.classList.remove("is-loading");refresh.textContent="↻ Atualizar";}
  }
 }
-
 async function login(){
  const input=$("#pin");
  pin=(input?.value||"").replace(/\D/g,"").slice(0,6);
@@ -202,6 +185,13 @@ function init(){
  input.addEventListener("keydown",(event)=>{if(event.key==="Enter") login();});
  refresh?.addEventListener("click",loadOrders);
  logoutButton?.addEventListener("click",logout);
+document.querySelectorAll(".panel-tab").forEach(tab=>tab.addEventListener("click",()=>{
+  const target=tab.dataset.panel;
+  document.querySelectorAll(".panel-tab").forEach(x=>x.classList.toggle("active",x===tab));
+  document.querySelectorAll(".admin-panel").forEach(panel=>panel.classList.toggle("active",panel.id==="panel-overview"?target==="overview":panel.dataset.panelSection===target));
+  const title=$("#topTitle");
+  if(title) title.textContent={overview:"Resumo",finance:"Financeiro",accounting:"Contabilidade",orders:"Pedidos"}[target]||"Painel";
+}));
  const month=$("#accountingMonth");if(month){month.value=accountingMonth();month.addEventListener("change",()=>updateAccounting(orders))}
  $("#addExpense")?.addEventListener("click",()=>{
   const desc=($("#expenseDesc")?.value||"").trim(),value=Number($("#expenseValue")?.value||0);
