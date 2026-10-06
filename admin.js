@@ -12,7 +12,7 @@ const esc=(value)=>String(value??"").replace(/[&<>"]/g,(char)=>({"&":"&amp;","<"
 
 const settings=()=>({
  name:localStorage.getItem("esh-sender-name")||"Eletroshopp",
- cep:localStorage.getItem("esh-sender-cep")||"84272-402",
+ cep:"84272-402",
  address:localStorage.getItem("esh-sender-address")||"",
  city:localStorage.getItem("esh-sender-city")||"Telêmaco Borba - PR"
 });
