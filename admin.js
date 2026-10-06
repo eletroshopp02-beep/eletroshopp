@@ -113,12 +113,14 @@ function updateAccounting(list){
  const title=$("#finance")?.querySelector(".finance-head p");if(title)title.textContent="Mês "+month+" • "+valid.length+" pedido(s) • "+(pending?"Há produtos sem custo cadastrado.":"Todos os custos estão cadastrados.");
 }
 function monthKey(date){const d=new Date(date);return isNaN(d)?"":d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")}
+function updateDeleteControls(){const checks=[...document.querySelectorAll("[data-order-select]")],checked=checks.filter(x=>x.checked),all=$("#selectAllOrders");if(all){all.checked=checks.length>0&&checked.length===checks.length;all.indeterminate=checked.length>0&&checked.length<checks.length}const btn=$("#deleteSelected");if(btn)btn.disabled=checked.length===0;const count=$("#selectedCount");if(count)count.textContent=checked.length;}
 function render(list){
  const safeList=Array.isArray(list)?list:[];
  const summary=$("#summary");
  const ordersEl=$("#orders");
  const stat=$("#statOrders");
  if(summary) summary.textContent=safeList.length+" pedido(s)";
+ const selected=new Set([...document.querySelectorAll("[data-order-select]:checked")].map(x=>x.value));
  if(stat) stat.textContent=safeList.length;
  updateFinance(safeList);
  updateAccounting(safeList);
@@ -135,7 +137,7 @@ function render(list){
    const label={novo:"Novo",em_separacao:"Em separação",enviado:"Enviado",entregue:"Entregue",cancelado:"Cancelado"}[status];
    return "<option value='"+status+"' "+(order.status===status?"selected":"")+">"+label+"</option>";
   }).join("");
-  return "<article class='order'><div class='order-head'><div><b>"+esc(order.id)+"</b><small>"+esc(order.created_at?new Date(order.created_at).toLocaleString("pt-BR"):"")+"</small></div><span class='badge'>"+esc(order.status||"novo")+"</span></div><div class='meta'><div><small>Cliente</small>"+esc(buyer.name||"—")+"</div><div><small>WhatsApp</small>"+esc(buyer.phone||"—")+"</div><div><small>CEP de entrega</small>"+esc(buyer.cep||"—")+"</div></div><p><small>Endereço de entrega</small>"+esc(buyer.address||"—")+"</p>"+items.map((item)=>"<div class='item'><span>"+esc((item.quantity||1)+"× "+(item.name||"Produto"))+"</span><b>"+money((item.price||0)*(item.quantity||1))+"</b></div>").join("")+"<div class='totals'><span>Produtos: <b>"+money(order.total_products)+"</b></span><span>Frete: <b>"+money(freight.price)+"</b></span><strong>Total: "+money(order.grand_total)+"</strong></div><div class='order-actions'><select data-status='"+esc(order.id)+"'>"+options+"</select><button class='print-btn' data-print='"+esc(order.id)+"'>🖨 Imprimir pedido</button><button class='label-btn' data-label='"+esc(order.id)+"'>🏷 Imprimir etiqueta</button></div></article>";
+  return "<article class='order'><div class='order-head'><div class='order-select'><input type='checkbox' data-order-select value=\""+esc(order.id)+"\" "+(selected.has(String(order.id))?"checked":"")+"><div><b>"+esc(order.id)+"</b><small>"+esc(order.created_at?new Date(order.created_at).toLocaleString("pt-BR"):"")+"</small></div></div><span class='badge'>"+esc(order.status||"novo")+"</span></div><div class='meta'><div><small>Cliente</small>"+esc(buyer.name||"—")+"</div><div><small>WhatsApp</small>"+esc(buyer.phone||"—")+"</div><div><small>CEP de entrega</small>"+esc(buyer.cep||"—")+"</div></div><p><small>Endereço de entrega</small>"+esc(buyer.address||"—")+"</p>"+items.map((item)=>"<div class='item'><span>"+esc((item.quantity||1)+"× "+(item.name||"Produto"))+"</span><b>"+money((item.price||0)*(item.quantity||1))+"</b></div>").join("")+"<div class='totals'><span>Produtos: <b>"+money(order.total_products)+"</b></span><span>Frete: <b>"+money(freight.price)+"</b></span><strong>Total: "+money(order.grand_total)+"</strong></div><div class='order-actions'><select data-status='"+esc(order.id)+"'>"+options+"</select><button class='print-btn' data-print='"+esc(order.id)+"'>🖨 Imprimir pedido</button><button class='label-btn' data-label='"+esc(order.id)+"'>🏷 Imprimir etiqueta</button></div></article>";
  }).join("");
 }
 
@@ -146,6 +148,7 @@ async function loadOrders(){
   const data=await api("GET");
   orders=Array.isArray(data)?data:(Array.isArray(data.orders)?data.orders:[]);
   render(orders);
+  updateDeleteControls();
   const msg=$("#loginMsg");
   if(msg) msg.textContent="";
  }catch(error){
@@ -184,6 +187,9 @@ function init(){
  enter.addEventListener("click",login);
  input.addEventListener("keydown",(event)=>{if(event.key==="Enter") login();});
  refresh?.addEventListener("click",loadOrders);
+ $("#selectAllOrders")?.addEventListener("change",event=>{document.querySelectorAll("[data-order-select]").forEach(x=>x.checked=event.target.checked);updateDeleteControls();});
+ $("#deleteSelected")?.addEventListener("click",async()=>{const ids=[...document.querySelectorAll("[data-order-select]:checked")].map(x=>x.value);if(!ids.length)return;const ok=confirm(ids.length===1?"Excluir este pedido permanentemente?":"Excluir os "+ids.length+" pedidos selecionados permanentemente?");if(!ok)return;const btn=$("#deleteSelected");if(btn){btn.disabled=true;btn.textContent="🗑 Excluindo..."}try{await Promise.all(ids.map(id=>api("DELETE",{id})));await loadOrders();}catch(error){alert("Não foi possível excluir todos os pedidos: "+error.message);await loadOrders();}finally{if(btn)btn.innerHTML="🗑 Excluir selecionados <span id=\"selectedCount\">0</span>";updateDeleteControls();}});
+
  logoutButton?.addEventListener("click",logout);
 document.querySelectorAll(".panel-tab").forEach(tab=>tab.addEventListener("click",()=>{
   const target=tab.dataset.panel;
@@ -208,6 +214,8 @@ document.querySelectorAll(".panel-tab").forEach(tab=>tab.addEventListener("click
   try{await api("POST",{id,status:event.target.value});await loadOrders();}
   catch(error){alert(error.message);}
  });
+
+ document.addEventListener("change",(event)=>{if(event.target?.matches("[data-order-select]")){updateDeleteControls();}});
 
  document.addEventListener("click",(event)=>{
   const expense=event.target?.dataset?.expense;
