@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#08090d">
+<title>Pagamento — Eletroshopp</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#08090d;color:#fff;font-family:Arial,sans-serif;display:grid;place-items:center;padding:24px}
+.card{width:min(560px,100%);background:#11131a;border:1px solid #252936;border-radius:24px;padding:34px;text-align:center;box-shadow:0 20px 60px #0008}
+.logo{width:150px;max-width:60%;margin-bottom:24px}.icon{font-size:56px;margin:4px 0 16px}.ok{color:#69e39b}.wait{color:#ffd166}h1{margin:0 0 12px;font-size:28px}p{color:#b8bdc9;line-height:1.55;margin:10px 0}.order{margin:22px 0;padding:15px;border-radius:14px;background:#191c25;color:#fff;font-weight:700}.btn{display:inline-block;margin-top:12px;padding:14px 22px;border-radius:12px;background:#fff;color:#08090d;text-decoration:none;font-weight:800}.small{font-size:13px;color:#858b99}
+</style>
+</head>
+<body>
+<main class="card">
+<img class="logo" src="assets/logo.svg" alt="Eletroshopp">
+<div id="icon" class="icon wait">⏳</div>
+<h1 id="title">Pagamento recebido</h1>
+<p id="text">Estamos confirmando seu pagamento. Aguarde alguns instantes; a confirmação será registrada automaticamente no seu pedido.</p>
+<div id="order" class="order"></div>
+<a id="receipt" class="btn" target="_blank" rel="noopener" hidden>Ver comprovante</a>
+<br>
+<a class="btn" href="/">Voltar para a Eletroshopp</a>
+<p class="small">Você pode fechar esta página depois de guardar o comprovante.</p>
+</main>
+<script>
+(()=>{const q=new URLSearchParams(location.search),order=q.get("order_nsu")||"",receipt=q.get("receipt_url")||"",method=q.get("capture_method")||"";document.getElementById("order").textContent=order?"Pedido: "+order:"Pedido Eletroshopp";if(receipt){const a=document.getElementById("receipt");a.href=receipt;a.hidden=false}if(method==="pix"){document.getElementById("icon").textContent="✓";document.getElementById("icon").className="icon ok"}else if(method==="credit_card"){document.getElementById("icon").textContent="✓";document.getElementById("icon").className="icon ok"}})();
+</script>
+</body>
+</html>
