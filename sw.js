@@ -1,4 +1,4 @@
-const CACHE="eletroshopp-stable2";
+const CACHE="eletroshopp-stable3";
 const SHELL=["./","./index.html","./styles.css","./app.js","./data/store-products.js","./assets/logo.svg","./assets/splash.svg","./assets/app-bg.svg"];
 const isSameOrigin=u=>u.origin===self.location.origin;
 const isDataFile=u=>/\/data\/(store-products|catalog-images)\.js$/i.test(u.pathname);
