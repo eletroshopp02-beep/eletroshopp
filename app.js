@@ -9,7 +9,7 @@ function norm(v){return String(v??"").toLowerCase().normalize("NFD").replace(/[\
 function collectImages(v,key="",out={}){if(typeof v==="string"&&v.startsWith("data:image/")){if(key)out[norm(key)]=v;catalogImageList.push(v);return out}if(Array.isArray(v)){v.forEach((x,i)=>collectImages(x,String(i),out));return out}if(v&&typeof v==="object"){Object.entries(v).forEach(([k,x])=>collectImages(x,k,out));}return out}
 async function loadCatalogImages(){
  try{
-  const t=await fetch("data/catalog-images.js?v=20261008-catalog",{cache:"default"}).then(r=>r.text());
+  const t=await fetch("/data/catalog-images.js?v=20261008-catalog",{cache:"default"}).then(r=>r.text());
   const transformed=t.replace(/^\s*(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=/gm,"window.__ESH_IMG_$1=");
   new Function(transformed)();
   const keys=Object.keys(window).filter(k=>k.startsWith("__ESH_IMG_"));
@@ -40,7 +40,7 @@ function imageFor(p,index){
 function normalize(p,i){return{id:String(p.id??p.code??i+1),code:p.code||p.id||"",name:p.name||"Produto Eletroshopp",description:p.description||"Produto do catálogo atualizado do fornecedor.",price:Number(p.price)||0,category:p.category||"Smartwatch",brand:p.brand||"Eletroshopp",image:imageFor(p,i),stock:Number(p.stock??0),weight:Number(p.weight||.3),width:Number(p.width||15),height:Number(p.height||10),length:Number(p.length||20)}}
 async function getProducts(){
  let base=Array.isArray(window.ELETRO_PRODUCTS)?window.ELETRO_PRODUCTS:[];
- if(!base.length){try{const t=await fetch("data/store-products.js?v=20261005-catalogfix5",{cache:"no-store"}).then(r=>r.text());new Function(t)();base=Array.isArray(window.ELETRO_PRODUCTS)?window.ELETRO_PRODUCTS:[]}catch(e){console.warn("catalog fallback",e)}}
+ if(!base.length){try{const t=await fetch("/data/store-products.js?v=20261005-catalogfix5",{cache:"no-store"}).then(r=>r.text());new Function(t)();base=Array.isArray(window.ELETRO_PRODUCTS)?window.ELETRO_PRODUCTS:[]}catch(e){console.warn("catalog fallback",e)}}
  return base.map(normalize).filter(p=>p.price>0||p.stock===0)
 }
 try{cart=JSON.parse(localStorage.getItem("eletroshopp-cart-v3")||"[]").filter(x=>x&&x.id)}catch(e){}
