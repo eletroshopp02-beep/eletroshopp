@@ -22,6 +22,7 @@ function imageFor(p,index){
  for(const k of keys){const v=catalogImages[norm(k)];if(v)return v}
  const n=norm(p.name),cat=norm(p.category);
  const supplierImages={
+  "kit-46-ferramentas":"https://down-br.img.susercontent.com/file/sg-11134201-7rdw7-lxmyjrfwi1c8ab","parafusadeira-48v":"https://down-br.img.susercontent.com/file/br-11134207-81ztc-mji7rr54qhoj86",
   "action":"https://wearzonebrasil.com.br/cdn/shop/files/vetor_cima_2.png?v=1721154074",
   "pulse":"https://wearzonebrasil.com.br/cdn/shop/files/vetoresquerda_2.png?v=1721155685",
   "easy":"https://wearzonebrasil.com.br/cdn/shop/files/PRETO_2_9cd57d55-1181-4fd5-900a-c117936703cf.png?v=1743620951",
