@@ -19,7 +19,7 @@ async function loadCatalogImages(){
 }
 function imageFor(p,index){
  const keys=[p.code,p.id,p.name];
- for(const k of keys){const v=catalogImages[norm(k)];if(v)return v}if(p.code==="KIT-46-FERRAMENTAS")return "https://down-br.img.susercontent.com/file/sg-11134201-7rdw7-lxmyjrfwi1c8ab";if(p.code==="PARAFUSADEIRA-48V")return "https://down-br.img.susercontent.com/file/br-11134207-81ztc-mji7rr54qhoj86";
+ for(const k of keys){const v=catalogImages[norm(k)];if(v)return v}if(p.code==="KIT-46-FERRAMENTAS")return "https://down-br.img.susercontent.com/file/sg-11134201-7rdw7-lxmyjrfwi1c8ab";if(p.code==="PARAFUSADEIRA-48V")return "https://down-br.img.susercontent.com/file/br-11134207-81ztc-mji7rr54qhoj86";if(p.code==="FURADEIRA-12V")return "https://images.tcdn.com.br/img/img_prod/438510/parafusadeira_furadeira_profissional_sem_fio_torque_18_1_broca_bits_maleta_vonder_15387_2_296b7f19e2db964af46068ef0426f895.jpg";
  const n=norm(p.name),cat=norm(p.category);
  const supplierImages={
   "kit-46-ferramentas":"https://down-br.img.susercontent.com/file/sg-11134201-7rdw7-lxmyjrfwi1c8ab","parafusadeira-48v":"https://down-br.img.susercontent.com/file/br-11134207-81ztc-mji7rr54qhoj86",
