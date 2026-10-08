@@ -19,7 +19,7 @@ async function loadCatalogImages(){
 }
 function imageFor(p,index){
  const keys=[p.code,p.id,p.name];
- for(const k of keys){const v=catalogImages[norm(k)];if(v)return v}if(p.code==="KIT-46-FERRAMENTAS")return "https://down-br.img.susercontent.com/file/sg-11134201-7rdw7-lxmyjrfwi1c8ab";if(p.code==="PARAFUSADEIRA-48V")return "https://down-br.img.susercontent.com/file/br-11134207-81ztc-mji7rr54qhoj86";if(p.code==="FURADEIRA-12V")return "https://a-static.mlcdn.com.br/420x420/furadeira-parafusadeira-a-bateria-12v-bivolt-3-8-10mm-hammer/ismaferferramentas/22741/231990c85ab28928c82108145662ea78.jpeg";
+ for(const k of keys){const v=catalogImages[norm(k)];if(v)return v}if(p.code==="KIT-46-FERRAMENTAS")return "https://down-br.img.susercontent.com/file/sg-11134201-7rdw7-lxmyjrfwi1c8ab";if(p.code==="PARAFUSADEIRA-48V")return "https://down-br.img.susercontent.com/file/br-11134207-81ztc-mji7rr54qhoj86";if(p.code==="FURADEIRA-12V")return "https://images.tcdn.com.br/img/img_prod/651731/parafusadeira_sem_fio_hammer_pli11_bateria_12v_litio_3259_1_ed35be503994efb61dd9258e5dc2f4af.png";
  const n=norm(p.name),cat=norm(p.category);
  const supplierImages={
   "kit-46-ferramentas":"https://down-br.img.susercontent.com/file/sg-11134201-7rdw7-lxmyjrfwi1c8ab","parafusadeira-48v":"https://down-br.img.susercontent.com/file/br-11134207-81ztc-mji7rr54qhoj86",
