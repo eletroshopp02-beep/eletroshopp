@@ -1,0 +1,50 @@
+name: Monitorar domínio e publicação da Eletroshopp
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "15 11 * * *"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verificar HTTPS e redirecionamentos
+        id: https
+        continue-on-error: true
+        run: |
+          set -e
+          for host in eletroshopp.com.br www.eletroshopp.com.br; do
+            code=$(curl -L -sS -o /dev/null -w '%{http_code}' --max-time 25 "https://$host/")
+            echo "$host HTTP $code"
+            test "$code" -ge 200 -a "$code" -lt 400
+          done
+
+      - name: Verificar DNS para GitHub Pages
+        id: dns
+        continue-on-error: true
+        run: |
+          set -e
+          expected='185.199.108.153 185.199.109.153 185.199.110.153 185.199.111.153'
+          actual=$(dig +short A eletroshopp.com.br | sort -V | tr '\n' ' ' | xargs)
+          echo "A records: $actual"
+          for ip in $expected; do echo "$actual" | grep -q "$ip"; done
+          cname=$(dig +short CNAME www.eletroshopp.com.br | tr '[:upper:]' '[:lower:]')
+          echo "www CNAME: $cname"
+          echo "$cname" | grep -q 'eletroshopp.com.br\|eletroshopp02-beep.github.io'
+
+      - name: Abrir alerta se houver falha
+        if: steps.https.outcome == 'failure' || steps.dns.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = 'ALERTA: domínio ou publicação da Eletroshopp';
+            const body = 'O monitoramento automático detectou falha em HTTPS ou DNS. Consulte a execução: ' + context.serverUrl + '/' + context.repo.owner + '/' + context.repo.repo + '/actions/runs/' + context.runId;
+            const issues = await github.rest.issues.listForRepo({owner:context.repo.owner,repo:context.repo.repo,state:'open',per_page:100});
+            if (!issues.data.some(i => i.title === title)) {
+              await github.rest.issues.create({owner:context.repo.owner,repo:context.repo.repo,title,body,labels:[]});
+            }
