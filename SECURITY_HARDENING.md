@@ -27,9 +27,9 @@ Deployment status:
 
 - `infinitepay-webhook`: deployed, version 3, JWT verification disabled as required for the provider callback.
 - `infinitepay-verify-payment`: deployed, version 1, JWT verification disabled; payment status is independently checked server-to-server.
-- `admin-orders`: **not deployed yet**. It requires the new `ELETRO_ADMIN_PIN` secret to be configured first.
+- `admin-orders`: deployed, version 13. It fails closed with `ADMIN_NOT_CONFIGURED` until a new `ELETRO_ADMIN_PIN` secret (32+ characters) is set. This temporarily suspends admin API access to prevent unauthorized order reads/changes.
 
-After setting the secret, deploy `admin-orders` from this repository source:
+After setting the secret, the deployed `admin-orders` function will accept the new secret. Then publish the website files in this branch so the admin screens use the new login flow:
 
 - `admin-orders` — custom header authentication; keep JWT verification disabled for this function because it authenticates with the server-only secret in `x-admin-pin`.
 
