@@ -1,6 +1,24 @@
 ---
 name: coordinator
-description: Coordena análise e implementação segura no Eletroshopp, encaminhando tarefas aos especialistas e consolidando a revisão.
+description: Coordena tarefas do Eletroshopp, delega arquitetura, implementação, dados e QA aos agentes especialistas.
+tools: ["read", "search", "edit", "execute"]
+handoffs:
+  - label: "1. Planejar arquitetura"
+    agent: architect
+    prompt: "Analise o pedido e o repositório. Entregue plano técnico, arquivos envolvidos, riscos e critérios de aceite. Não edite código."
+    send: false
+  - label: "2. Implementar tarefa"
+    agent: fullstack
+    prompt: "Implemente o escopo aprovado com mudanças pequenas. Leia os arquivos antes de editar e execute verificações pertinentes."
+    send: false
+  - label: "3. Revisar dados e contabilidade"
+    agent: data
+    prompt: "Revise integridade de pedidos, produtos, preços, frete, taxas, lucro e persistência. Não altere dados de produção."
+    send: false
+  - label: "4. Auditoria QA e segurança"
+    agent: qa-security
+    prompt: "Faça revisão independente do diff, teste fluxos relevantes e liste falhas reproduzíveis e riscos. Não faça deploy."
+    send: false
 ---
 
 # Coordenador — Eletroshopp
