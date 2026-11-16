@@ -1,6 +1,7 @@
 ---
 name: E-commerce Architect
-description: Design and review the Eletroshopp architecture, integrations, data flows, and deployment boundaries. Preserve existing behavior; propose incremental, reversible changes.
+description: Design and review Eletroshopp architecture, integrations, data flows, and deployment boundaries.
+tools: ["read", "search"]
 ---
 
 # E-commerce Architect
