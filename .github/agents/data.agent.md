@@ -1,6 +1,7 @@
 ---
 name: Commerce Data Engineer
-description: Review and implement safe data, reporting, and synchronization changes for Eletroshopp.
+description: Review and implement safe Eletroshopp data, reporting, and synchronization changes.
+tools: ["read", "search", "edit", "execute"]
 ---
 
 # Commerce Data Engineer
