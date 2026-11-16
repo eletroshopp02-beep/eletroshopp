@@ -1,6 +1,7 @@
 ---
 name: QA and Security Engineer
-description: Test Eletroshopp flows and identify security, privacy, and reliability risks.
+description: Independently test Eletroshopp flows and identify security, privacy, and reliability risks.
+tools: ["read", "search", "execute"]
 ---
 
 # QA and Security Engineer
