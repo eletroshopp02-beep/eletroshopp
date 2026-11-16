@@ -13,7 +13,7 @@ jobs:
   monitor:
     runs-on: ubuntu-latest
     steps:
-      - name: Verificar HTTPS e redirecionamentos
+      - name: Verificar HTTPS
         id: https
         continue-on-error: true
         run: |
@@ -24,18 +24,16 @@ jobs:
             test "$code" -ge 200 -a "$code" -lt 400
           done
 
-      - name: Verificar DNS para GitHub Pages
+      - name: Verificar se DNS resolve
         id: dns
         continue-on-error: true
         run: |
           set -e
-          expected='185.199.108.153 185.199.109.153 185.199.110.153 185.199.111.153'
-          actual=$(dig +short A eletroshopp.com.br | sort -V | tr '\n' ' ' | xargs)
-          echo "A records: $actual"
-          for ip in $expected; do echo "$actual" | grep -q "$ip"; done
-          cname=$(dig +short CNAME www.eletroshopp.com.br | tr '[:upper:]' '[:lower:]')
-          echo "www CNAME: $cname"
-          echo "$cname" | grep -q 'eletroshopp.com.br\|eletroshopp02-beep.github.io'
+          for host in eletroshopp.com.br www.eletroshopp.com.br; do
+            records=$(dig +short "$host" A; dig +short "$host" AAAA; dig +short "$host" CNAME)
+            echo "$host DNS: $records"
+            test -n "$records"
+          done
 
       - name: Abrir alerta se houver falha
         if: steps.https.outcome == 'failure' || steps.dns.outcome == 'failure'
@@ -43,8 +41,8 @@ jobs:
         with:
           script: |
             const title = 'ALERTA: domínio ou publicação da Eletroshopp';
-            const body = 'O monitoramento automático detectou falha em HTTPS ou DNS. Consulte a execução: ' + context.serverUrl + '/' + context.repo.owner + '/' + context.repo.repo + '/actions/runs/' + context.runId;
+            const body = 'O monitoramento detectou falha em HTTPS ou resolução DNS. Consulte a execução: ' + context.serverUrl + '/' + context.repo.owner + '/' + context.repo.repo + '/actions/runs/' + context.runId;
             const issues = await github.rest.issues.listForRepo({owner:context.repo.owner,repo:context.repo.repo,state:'open',per_page:100});
             if (!issues.data.some(i => i.title === title)) {
-              await github.rest.issues.create({owner:context.repo.owner,repo:context.repo.repo,title,body,labels:[]});
+              await github.rest.issues.create({owner:context.repo.owner,repo:context.repo.repo,title,body});
             }

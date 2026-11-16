@@ -3,7 +3,6 @@ name: Claude Agency — evolução automática da Eletroshopp
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 12 * * 1"
 
 permissions:
   contents: write
@@ -21,6 +20,8 @@ jobs:
     if: github.repository == 'eletroshopp02-beep/eletroshopp'
     runs-on: ubuntu-latest
     timeout-minutes: 35
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,6 +29,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run Claude Agency
+        if: env.ANTHROPIC_API_KEY != ''
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
