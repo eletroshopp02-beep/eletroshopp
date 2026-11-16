@@ -162,7 +162,7 @@ async function loadOrders(){
 async function login(){
  const input=$("#pin");
  pin=(input?.value||"").trim();
- if(pin.length<16){showLogin("Informe a chave administrativa configurada no servidor.");return;}
+ if(pin.length<32){showLogin("A chave administrativa deve ter pelo menos 32 caracteres.");return;}
  sessionStorage.setItem("esh-admin-pin",pin);
  showApp();
  await loadOrders();
