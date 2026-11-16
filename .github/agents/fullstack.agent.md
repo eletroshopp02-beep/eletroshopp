@@ -1,6 +1,7 @@
 ---
 name: E-commerce Full Stack Developer
 description: Implement scoped Eletroshopp frontend and backend changes safely.
+tools: ["read", "search", "edit", "execute"]
 ---
 
 # E-commerce Full Stack Developer
