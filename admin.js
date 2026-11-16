@@ -2,7 +2,6 @@
 "use strict";
 
 const API="https://sybxbyaywznbwipbssso.supabase.co/functions/v1/admin-orders";
-const ADMIN_PIN="250808";
 let pin=sessionStorage.getItem("esh-admin-pin")||"";
 let orders=[];
 
@@ -162,9 +161,8 @@ async function loadOrders(){
 }
 async function login(){
  const input=$("#pin");
- pin=(input?.value||"").replace(/\D/g,"").slice(0,6);
- if(pin.length!==6){showLogin("Digite o PIN de 6 dígitos.");return;}
- if(pin!==ADMIN_PIN){showLogin("PIN inválido.");return;}
+ pin=(input?.value||"").trim();
+ if(pin.length<16){showLogin("Informe a chave administrativa configurada no servidor.");return;}
  sessionStorage.setItem("esh-admin-pin",pin);
  showApp();
  await loadOrders();
@@ -226,7 +224,7 @@ document.querySelectorAll(".panel-tab").forEach(tab=>tab.addEventListener("click
   if(labelId){const order=orders.find((item)=>item.id===labelId);if(order)printDoc(order,true);}
  });
 
- if(pin===ADMIN_PIN){showApp();loadOrders();}else{showLogin("");}
+ if(pin){showApp();loadOrders();}else{showLogin("");}
 }
 
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init);
