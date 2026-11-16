@@ -1,0 +1,65 @@
+name: Claude Agency — evolução automática da Eletroshopp
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 12 * * 1"
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: read
+  id-token: write
+
+concurrency:
+  group: claude-agency-store
+  cancel-in-progress: false
+
+jobs:
+  agency:
+    if: github.repository == 'eletroshopp02-beep/eletroshopp'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude Agency
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Você é a equipe de produto e engenharia da Eletroshopp.
+            Leia primeiro CLAUDE.md e os perfis em .github/agents/.
+            Trabalhe como Coordinator, delegando mentalmente para Architect,
+            Full Stack, Data Engineer e QA/Security.
+
+            Objetivo: evoluir a loja https://eletroshopp.com.br para uma experiência
+            de e-commerce profissional, confiável, rápida, responsiva e que converta.
+            Inspecione o estado real do repositório e escolha UMA melhoria de maior
+            impacto ainda não implementada. Prioridades: UX mobile, identidade visual
+            consistente, navegação/categorias, busca e filtros, páginas de produto,
+            acessibilidade, SEO técnico, performance, checkout seguro, estoque e
+            painel financeiro integrado.
+
+            Regras obrigatórias:
+            - Não invente preço, estoque, avaliações, desconto, prazo ou especificação.
+            - Não exponha nem solicite secrets; nunca grave chaves no código.
+            - Não altere registros reais de pedidos/pagamentos nem faça compras.
+            - Preserve as validações server-side e a integração InfinitePay.
+            - Não altere DNS, domínio, secrets, permissões ou configurações de produção.
+            - Faça mudanças pequenas e testáveis, execute as validações pertinentes.
+            - Atualize documentação e registre riscos/pendências.
+            - Crie uma branch e deixe as mudanças para revisão em pull request;
+              não faça merge nem publicação em produção.
+            - Não repita uma melhoria já existente. Se não houver tarefa segura,
+              apenas produza um relatório de auditoria com evidências.
+
+            Entregue código real, não apenas recomendações. No final, resuma arquivos
+            alterados, testes, riscos e o que ainda exige decisão humana.
+          claude_args: |
+            --max-turns 12
+            --append-system-prompt "Follow repository agent instructions. Never merge PRs or deploy production."
