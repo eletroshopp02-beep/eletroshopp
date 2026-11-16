@@ -2,7 +2,19 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#08090d"><meta name="description" content="Eletroshopp — tecnologia, smartwatches, fones e acessórios.">
+<meta name="theme-color" content="#08090d">
+<meta name="description" content="Encontre smartwatches, fones Bluetooth, acessórios e ferramentas na Eletroshopp. Consulte preços, calcule o frete e finalize seu pedido online.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://eletroshopp.com.br/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Eletroshopp">
+<meta property="og:title" content="Eletroshopp | Tecnologia e acessórios">
+<meta property="og:description" content="Smartwatches, fones Bluetooth, acessórios e ferramentas. Escolha seus produtos e consulte o frete no checkout.">
+<meta property="og:url" content="https://eletroshopp.com.br/">
+<meta property="og:image" content="https://eletroshopp.com.br/assets/logo.svg">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Eletroshopp | Tecnologia e acessórios">
+<meta name="twitter:description" content="Escolha seus produtos, consulte o frete e faça seu pedido online.">
 <link rel="manifest" href="manifest.json?v=20261008-imagesfix4"><link rel="icon" href="assets/logo.svg">
 <link rel="stylesheet" href="styles.css?v=20261008-imagesfix4"><title>Eletroshopp — Tecnologia no seu dia a dia</title>
 </head>
@@ -13,7 +25,7 @@
   <a class="brand" href="#" aria-label="Eletroshopp"><img src="assets/logo.svg" alt="Eletroshopp"></a>
   <button class="header-icon" data-focus-search aria-label="Buscar">⌕</button>
   <button class="header-cart" data-open-cart aria-label="Carrinho">🛒 <b id="cartCount">0</b></button>
-  <button class="header-icon" aria-label="Menu">☰</button>
+  <button class="header-icon" data-scroll-catalog aria-label="Ver categorias">☰</button>
 </header>
 
 <main>
@@ -33,7 +45,7 @@
   <div class="hero-copy">
     <span>SMARTWATCHES</span>
     <h1>Tecnologia no<br>seu pulso</h1>
-    <p>Modelos selecionados do catálogo atualizado do fornecedor.</p>
+    <p>Escolha seu modelo favorito e consulte as opções disponíveis.</p>
     <button class="hero-cta" data-category="Smartwatch">Ver produtos</button>
   </div>
   <div class="hero-products">
@@ -43,13 +55,13 @@
 </section>
 
 <section class="benefits">
-  <div><span>🚚</span><b>Frete rápido</b><small>para todo o Brasil</small></div>
-  <div><span>🛡️</span><b>Compra segura</b><small>Seus dados protegidos</small></div>
-  <div><span>💳</span><b>Parcele em até</b><small>12x no cartão</small></div>
+  <div><span>🚚</span><b>Frete calculado</b><small>informe seu CEP</small></div>
+  <div><span>🔒</span><b>Pagamento online</b><small>via InfinitePay</small></div>
+  <div><span>💬</span><b>Atendimento</b><small>pelo WhatsApp</small></div>
 </section>
 
 <section class="section">
-  <div class="section-title"><div><small>SELEÇÃO ELETROSHOPP</small><h2>Mais vendidos</h2></div><button class="see-all" data-scroll-catalog>Ver todos</button></div>
+  <div class="section-title"><div><small>SELEÇÃO ELETROSHOPP</small><h2>Em destaque</h2></div><button class="see-all" data-scroll-catalog>Ver todos</button></div>
   <div id="featured" class="product-rail"></div>
 </section>
 
@@ -65,12 +77,20 @@
   <div id="brands" class="chips-hidden"></div>
   <div id="products" class="product-grid"></div><div id="catalogSentinel" class="catalog-sentinel">Carregando mais produtos…</div>
 </section>
+<section class="store-help">
+  <div>
+    <small>PRECISA DE AJUDA?</small>
+    <h2>Fale com a Eletroshopp</h2>
+    <p>Tem dúvidas sobre um modelo, disponibilidade ou entrega? Nossa equipe pode ajudar pelo WhatsApp.</p>
+    <a href="https://wa.me/5542998157736?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20Eletroshopp%20e%20quero%20tirar%20uma%20d%C3%BAvida." target="_blank" rel="noopener">Conversar pelo WhatsApp</a>
+  </div>
+</section>
 </main>
 
 <nav class="bottom-nav">
   <button class="active" data-scroll-top><span>⌂</span>Início</button>
   <button data-scroll-catalog><span>▦</span>Categorias</button>
-  <button data-category="Acessórios"><span>🏷</span>Ofertas</button>
+  <button data-scroll-catalog><span>🏷</span>Explorar</button>
   <button data-open-cart><span>🛒</span>Meu pedido</button>
   <button data-focus-search><span>⌕</span>Buscar</button>
 </nav>
