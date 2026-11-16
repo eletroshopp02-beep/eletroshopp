@@ -1,6 +1,6 @@
 # Agency Agents — Eletroshopp
 
-Project-specific agent profiles for safe, incremental e-commerce development. These are instruction profiles for compatible coding-agent clients; adding them does not start autonomous agents or deploy code.
+Project-specific agent profiles for safe, incremental e-commerce development. Select the Coordinator in GitHub Copilot Chat or VS Code Agent mode. In VS Code, use its handoff actions to pass work between specialists. On GitHub.com, select each custom agent from the agent picker as needed; IDE handoffs are not supported in the cloud agent.
 
 ## Profiles
 - `architect.agent.md` — architecture and integration design
