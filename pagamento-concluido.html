@@ -24,7 +24,42 @@
 <p class="small">Você pode fechar esta página depois de guardar o comprovante.</p>
 </main>
 <script>
-(()=>{const q=new URLSearchParams(location.search),order=q.get("order_nsu")||"",receipt=q.get("receipt_url")||"",method=q.get("capture_method")||"";document.getElementById("order").textContent=order?"Pedido: "+order:"Pedido Eletroshopp";if(receipt){const a=document.getElementById("receipt");a.href=receipt;a.hidden=false}if(method==="pix"){document.getElementById("icon").textContent="✓";document.getElementById("icon").className="icon ok"}else if(method==="credit_card"){document.getElementById("icon").textContent="✓";document.getElementById("icon").className="icon ok"}})();
+(async()=>{
+ const q=new URLSearchParams(location.search);
+ const order=q.get("order_nsu")||"";
+ const transaction=q.get("transaction_nsu")||"";
+ const slug=q.get("slug")||"";
+ const receipt=q.get("receipt_url")||"";
+ const el=id=>document.getElementById(id);
+ el("order").textContent=order?"Pedido: "+order:"Pedido Eletroshopp";
+ el("title").textContent="Verificando pagamento";
+ el("text").textContent="Estamos consultando a confirmação diretamente na InfinitePay. Não feche esta página até terminar a verificação.";
+ if(!order||!transaction||!slug){
+   el("title").textContent="Pagamento em verificação";
+   el("text").textContent="Ainda não recebemos todos os dados necessários para confirmar o pagamento. Aguarde alguns instantes e consulte o status do pedido.";
+   return;
+ }
+ try{
+   const response=await fetch("https://sybxbyaywznbwipbssso.supabase.co/functions/v1/infinitepay-verify-payment",{
+     method:"POST",headers:{"Content-Type":"application/json"},
+     body:JSON.stringify({order_nsu:order,transaction_nsu:transaction,slug,receipt_url:receipt})
+   });
+   const data=await response.json().catch(()=>({}));
+   if(response.ok&&data.paid===true){
+     el("icon").textContent="✓";el("icon").className="icon ok";
+     el("title").textContent="Pagamento confirmado!";
+     el("text").textContent="A InfinitePay confirmou o pagamento. Seu pedido foi atualizado com sucesso.";
+     if(receipt){try{const u=new URL(receipt);if(u.protocol==="https:"){el("receipt").href=u.href;el("receipt").hidden=false}}catch{}}
+   }else{
+     el("icon").textContent="⏳";el("icon").className="icon wait";
+     el("title").textContent="Pagamento ainda não confirmado";
+     el("text").textContent="A InfinitePay ainda não confirmou este pagamento. Isso pode levar alguns instantes. Não faça um novo pagamento antes de verificar o status.";
+   }
+ }catch{
+   el("title").textContent="Não foi possível verificar agora";
+   el("text").textContent="Não conseguimos consultar a InfinitePay neste momento. O sistema continuará aguardando a confirmação automática.";
+ }
+})();
 </script>
 </body>
 </html>
