@@ -1,6 +1,6 @@
 # Security hardening — deployment checklist
 
-This branch stages security changes only. Nothing here has been deployed to the live Supabase project or merged into `main`.
+This branch contains security changes. The InfinitePay webhook and payment-verification functions have been deployed to the live Supabase project. The admin endpoint and website files have not been deployed or merged into `main`.
 
 ## Required Supabase secrets
 
@@ -23,11 +23,16 @@ The new `infinitepay-verify-payment` function performs the same verification whe
 
 ## Deploy order
 
-After reviewing this branch and setting the secrets, deploy these functions from the repository source:
+Deployment status:
+
+- `infinitepay-webhook`: deployed, version 3, JWT verification disabled as required for the provider callback.
+- `infinitepay-verify-payment`: deployed, version 1, JWT verification disabled; payment status is independently checked server-to-server.
+- `admin-orders`: **not deployed yet**. It requires the new `ELETRO_ADMIN_PIN` secret to be configured first.
+
+After setting the secret, deploy `admin-orders` from this repository source:
 
 - `admin-orders` — custom header authentication; keep JWT verification disabled for this function because it authenticates with the server-only secret in `x-admin-pin`.
-- `infinitepay-webhook` — public provider callback; keep JWT verification disabled and rely on the server-to-server `payment_check`.
-- `infinitepay-verify-payment` — public return-page verification; keep JWT verification disabled and rely on `payment_check`.
+
 
 Do not deploy `admin-orders` before the new 32+ character secret is configured; it intentionally returns `ADMIN_NOT_CONFIGURED` otherwise.
 
