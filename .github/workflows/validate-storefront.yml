@@ -1,0 +1,38 @@
+name: Validar melhorias da loja
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [growth/storefront-conversion-2026-11-16]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validar JavaScript
+        run: node --check app.js
+      - name: Validar catálogo ativo
+        run: |
+          python3 - <<'PY'
+          import json, re
+          from pathlib import Path
+          source = Path("data/store-products.js").read_text(encoding="utf-8")
+          match = re.fullmatch(r"window\.ELETRO_PRODUCTS=(.*);\s*", source, re.S)
+          assert match, "Formato do catálogo ativo inesperado"
+          products = json.loads(match.group(1))
+          assert products, "Catálogo vazio"
+          assert all(p.get("id") and p.get("name") and p.get("category") for p in products), "Produto sem identificador, nome ou categoria"
+          print(f"Catálogo válido: {len(products)} produtos")
+          print(f"Produtos sem preço configurado: {sum(float(p.get('price') or 0) <= 0 for p in products)}")
+          PY
+      - name: Validar SEO e atendimento
+        run: |
+          grep -q 'property="og:title"' index.html
+          grep -q 'rel="canonical"' index.html
+          grep -q 'wa.me/5542998157736' index.html
+          echo "SEO e contato presentes"

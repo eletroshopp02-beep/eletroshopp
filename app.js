@@ -48,11 +48,14 @@ const count=()=>cart.reduce((n,x)=>n+(Number(x.qty)||1),0),total=()=>cart.reduce
 function toast(m){const t=$("#toast");if(!t)return;t.textContent=m;t.classList.add("show");clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove("show"),2200)}
 function open(id){$(id)?.classList.add("open");document.body.style.overflow="hidden"}function close(id){$(id)?.classList.remove("open");if(!$(".drawer.open"))document.body.style.overflow=""}
 function save(){localStorage.setItem("eletroshopp-cart-v3",JSON.stringify(cart));renderCart();$("#cartCount").textContent=count();window.dispatchEvent(new Event("cart-updated"))}
-function add(id){const p=products.find(x=>x.id===String(id));if(!p)return;const x=cart.find(x=>x.id===p.id);x?x.qty++:cart.push({id:p.id,name:p.name,price:p.price,image:p.image,qty:1});save();open("#cart")}
+function add(id){const p=products.find(x=>x.id===String(id));if(!p)return;if(!(p.price>0))return toast("Consulte o preço deste produto pelo WhatsApp.");const x=cart.find(x=>x.id===p.id);x?x.qty++:cart.push({id:p.id,name:p.name,price:p.price,image:p.image,qty:1});save();open("#cart")}
 function change(id,d){const x=cart.find(x=>x.id===String(id));if(!x)return;x.qty+=d;if(x.qty<=0)cart=cart.filter(y=>y.id!==x.id);save()}
 function card(p){
  const fb=encodeURIComponent(fallback(p.name,norm(p.category).includes("fone")?"audio":norm(p.category).includes("ferrament")?"tools":norm(p.category).includes("oculos")?"glasses":"watch"));
- return '<article class="product-card"><div class="product-image"><img loading="lazy" src="'+esc(p.image)+'" alt="'+esc(p.name)+'" data-fallback="'+fb+'" onerror="this.onerror=null;this.src=decodeURIComponent(this.dataset.fallback)"></div><div class="product-info"><h3>'+esc(p.name)+'</h3><p>'+esc(p.description)+'</p><div class="rating">★★★★★</div><div class="price">'+(p.price?money(p.price):"Consulte")+'</div><button class="add" data-add="'+esc(p.id)+'">🛒 Adicionar</button></div></article>'
+ const contact="https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent("Olá! Tenho interesse no produto "+p.name+" da Eletroshopp. Pode me informar preço e disponibilidade?");
+ const purchasable=Number(p.price)>0;
+ const action=purchasable?'<button class="add" data-add="'+esc(p.id)+'">🛒 Adicionar ao carrinho</button>':'<a class="consult" href="'+contact+'" target="_blank" rel="noopener">Consultar no WhatsApp</a>';
+ return '<article class="product-card"><div class="product-image"><img loading="lazy" src="'+esc(p.image)+'" alt="'+esc(p.name)+'" data-fallback="'+fb+'" onerror="this.onerror=null;this.src=decodeURIComponent(this.dataset.fallback)"></div><div class="product-info"><h3>'+esc(p.name)+'</h3><p>'+esc(p.description)+'</p><div class="product-code">'+esc(p.category)+' · Ref. '+esc(p.code)+'</div><div class="price">'+(purchasable?money(p.price):"Consulte o preço")+'</div>'+action+'</div></article>'
 }
 function filtered(){
  const q=norm(state.search);
